@@ -7,7 +7,7 @@
 #include "order.h"
 
 bool order_table[12];
-Order order_queue[12];
+struct Order order_queue[12];
 
 /**
  * @brief Clears whole queue.
@@ -23,7 +23,7 @@ void order_queue_shift();
  *
  * @return 0 on success. Non-zero for failure.
  */
-int order_queue_add_order(Order order);
+int order_queue_add_order(struct Order order);
 
 /**
  * @brief Sorts queue, must be used when adding order.
@@ -32,16 +32,10 @@ int order_queue_add_order(Order order);
  */
 int order_queue_sort();
 
-/**
- * @brief Removes a handled order
- *
- * @return 0 on success. Non-zero for failure.
- */
-int order_queue_remove_order(Order order);
 
 /**
- * @brief Handles first order in queue.
+ * @brief Checks if ordering queue is empty.
  *
- * @return 0 on success. Non-zero for failure.
+ * @return 1 if true, 0 if false.
  */
-int order_queue_handle_order(/*first element in queue*/);
+int order_queue_empty();

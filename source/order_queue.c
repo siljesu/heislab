@@ -22,9 +22,9 @@ int order_queue_sort(){
 }
 
 int order_queue_add_order(struct Order order){
-	struct Order orders_going_up[4] = (Order*) malloc(4 * sizeof(order));
-	struct Order orders_going_down[4] = (Order*) malloc(4 * sizeof(order));
-	struct Order orders_from_inside[4] = (Order*) malloc(4 * sizeof(order));
+	struct Order orders_going_up[4] = (struct Order*) malloc(4 * sizeof(order));
+	struct Order orders_going_down[4] = (struct Order*) malloc(4 * sizeof(order));
+	struct Order orders_from_inside[4] = (struct Order*) malloc(4 * sizeof(order));
 
 	free(orders_going_up);
 	free(orders_going_down);

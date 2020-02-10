@@ -5,6 +5,7 @@
  */
 
 #include "hardware.h"
+#include <stdbool.h>
 
 struct Order {
 
