@@ -5,9 +5,18 @@
  */
 
 #include "order.h"
+#include <stdbool.h> //Exists in order.h. Remove once merged properly
+#define QUEUE_SIZE
 
+/**
+ * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
+ */
 bool order_table[12];
-Order order_queue[12];
+
+/**
+ * @brief Table to hold up to 12 orders (12 is the max possible), sorted after proximity in the elevator's current path.
+ */
+struct Order order_queue[12];
 
 /**
  * @brief Clears whole queue.
@@ -23,25 +32,11 @@ void order_queue_shift();
  *
  * @return 0 on success. Non-zero for failure.
  */
-int order_queue_add_order(Order order);
+int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovement direction);
 
 /**
  * @brief Sorts queue, must be used when adding order.
  *
  * @return 0 on success. Non-zero for failure.
  */
-int order_queue_sort();
-
-/**
- * @brief Removes a handled order
- *
- * @return 0 on success. Non-zero for failure.
- */
-int order_queue_remove_order(Order order);
-
-/**
- * @brief Handles first order in queue.
- *
- * @return 0 on success. Non-zero for failure.
- */
-int order_queue_handle_order(/*first element in queue*/);
+void order_queue_sort_incrementally(struct Order* temp_array, bool increasing);
