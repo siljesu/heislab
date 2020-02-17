@@ -155,3 +155,11 @@ int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovem
 	order_queue_sortOrderQueue(elevator_floor, direction);
 	return 0;
 }
+
+int order_queue_empty(){
+	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
+		if (!order_queue[i].emptyOrder)
+			return 0;
+	}
+	return 1;
+}

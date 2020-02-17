@@ -57,6 +57,9 @@ int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovem
 
 /**
  * @brief Checks if ordering queue is empty.
+ *
+ * @return 1 if empty
+ * @return 0 if not empty
 */
 int order_queue_empty();
 

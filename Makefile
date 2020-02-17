@@ -1,4 +1,4 @@
-SOURCES := main.c order_queue.c order.c
+SOURCES := order_queue.c order.c elevator.c
 
 SOURCE_DIR := source
 BUILD_DIR := build
