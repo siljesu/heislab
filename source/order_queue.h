@@ -30,6 +30,8 @@ void order_queue_shift();
 /**
  * @brief Adds a single, valid order
  *
+ * @param order_queue gives the currently first element in queue, for pointer location reference
+ *
  * @return 0 on success. Non-zero for failure.
  */
 int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovement direction);
@@ -40,3 +42,15 @@ int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovem
  * @return 0 on success. Non-zero for failure.
  */
 void order_queue_sort_incrementally(struct Order* temp_array, bool increasing);
+
+/**
+ * @brief Calls a queue sort for every movement direction change.
+ *
+ */
+void order_queue_sort_by_direction_change(HardwareMovement direction);
+
+/*
+ * @brief Sorts entire order queue, based on direction
+ */
+void order_queue_sortOrderQueue(struct Order* order, struct Order* order_queue, 
+							int elevator_floor, HardwareMovement direction);
