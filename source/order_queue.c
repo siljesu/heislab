@@ -9,6 +9,14 @@ void order_queue_clear(){
 	}
 }
 
+int order_queue_empty(){
+	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
+		if (!order_queue[i].emptyOrder)
+			return 0;
+	}
+	return 1;
+}
+
 void order_queue_shift(){
 	order_turn_off_light(order_queue[0]);
 	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
@@ -24,8 +32,8 @@ void order_queue_sort_incrementally(struct Order* temp_array, bool increasing){
 	
 	if (increasing){
 		temp_order = *(temp_array);
-		for (int i = 0; i < (QUEUE_SIZE - 2); i++){
-			for (int j = i; j < (QUEUE_SIZE - 2); j++){
+		for (int i = 0; i < (QUEUE_SIZE - 1); i++){
+			for (int j = i; j < (QUEUE_SIZE - 1); j++){
 				if ( (!(temp_array + j + 1)->emptyOrder) && ((temp_array + j + 1)->floor <= temp_order.floor) ){ //=> emptyOrder == false will go into if-statement
 					temp_order = *(temp_array + j + 1);
 				}	
@@ -36,8 +44,8 @@ void order_queue_sort_incrementally(struct Order* temp_array, bool increasing){
 
 	else if (!increasing){
 		temp_order = *(temp_array);
-		for (int i = 0; i < (QUEUE_SIZE - 2); i++){
-			for (int j = i; j < (QUEUE_SIZE - 2); j++){
+		for (int i = 0; i < (QUEUE_SIZE - 1); i++){
+			for (int j = i; j < (QUEUE_SIZE - 1); j++){
 				if ( (!(temp_array + j + 1)->emptyOrder) && ((temp_array + j + 1)->floor >= temp_order.floor) ){ //=> emptyOrder == false will go into if-statement
 					temp_order = *(temp_array + j + 1);
 				}	
@@ -157,12 +165,4 @@ int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovem
 
 	order_queue_sortOrderQueue(elevator_floor, direction);
 	return 0;
-}
-
-int order_queue_empty(){
-	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
-		if (!order_queue[i].emptyOrder)
-			return 0;
-	}
-	return 1;
 }
