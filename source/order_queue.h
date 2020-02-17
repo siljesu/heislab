@@ -6,7 +6,7 @@
 
 #include "order.h"
 #include <stdbool.h> //Exists in order.h. Remove once merged properly
-#define QUEUE_SIZE
+#define QUEUE_SIZE 12
 
 /**
  * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
@@ -27,30 +27,28 @@ void order_queue_clear();
  * @brief shifts every element in the order queue one place towards left
  */
 void order_queue_shift();
-/**
- * @brief Adds a single, valid order
- *
- * @param order_queue gives the currently first element in queue, for pointer location reference
- *
- * @return 0 on success. Non-zero for failure.
- */
-int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovement direction);
 
 /**
  * @brief Sorts queue, must be used when adding order.
- *
- * @return 0 on success. Non-zero for failure.
  */
 void order_queue_sort_incrementally(struct Order* temp_array, bool increasing);
 
 /**
- * @brief Calls a queue sort for every movement direction change.
- *
+ * @brief Receives "chunks" of sorted arrays, divided by direction. Sorts these in sequence, based on direction.
  */
-void order_queue_sort_by_direction_change(HardwareMovement direction);
+void order_queue_sortChunksByDirection(struct Order* going_up, 
+										struct Order* going_down, struct Order* other,
+										int count_up, int count_down, int count_other, 
+										int elevator_floor, HardwareMovement direction);
 
 /*
  * @brief Sorts entire order queue, based on direction
  */
-void order_queue_sortOrderQueue(struct Order* order, struct Order* order_queue, 
-							int elevator_floor, HardwareMovement direction);
+void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction);
+
+/**
+ * @brief Adds a single, valid order
+ *
+ * @return 0 on success. Non-zero for failure.
+ */
+int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovement direction);
