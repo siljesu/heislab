@@ -14,7 +14,7 @@
 * @brief state function pointer typedefed. 
 * 
 **/
-typedef void (*state)(int,HardwareMovement,struct Order);
+typedef void (*state)(int,HardwareMovement;
 
 
 /**
@@ -42,13 +42,22 @@ int elevator_amIAtFloor(int targetFloor)
 //--------------states------------------//
 
 /**
+* @brief State: idle. Will stay idle at a defined floor until stop button is pressed or new order arrives, either up or down or to enter elevator. 
+*
+* @param
+*
+* @return void function
+**/
+void s_idle(int floor, HardwareMovement moveDirection)
+
+/**
 * @brief State: moving up. Will initialize hardware movement until target floor reached (if new order arrives which gets higher priority, target floor can change).
 *
 * @param
 *
 * @return void function
 **/
-void s_movingUp(int floor, HardwareMovement moveDirection, struct Order firstOrder)
+void s_movingUp(int floor, HardwareMovement moveDirection)
 
 /**
 * @brief State: moving down. Will initialize hardware movement until target floor reached (if new order arrives which gets higher priority, target floor can change).
@@ -57,13 +66,40 @@ void s_movingUp(int floor, HardwareMovement moveDirection, struct Order firstOrd
 *
 * @return void function
 **/
-void s_movingDown(int floor, HardwareMovement moveDirection, struct Order firstOrder)
+void s_movingDown(int floor, HardwareMovement moveDirection)
 
 /**
-* @brief State: idle. Will stay idle at a defined floor until stop button is pressed or new order arrives, either up or down. 
+* @brief State: handle order. stops and opens door for three seconds. goes into idle state when finished.
 *
 * @param
 *
 * @return void function
 **/
-void s_idle(int floor, HardwareMovement moveDirection, struct Order firstOrder)
+void s_handleOrder(int floor, HardwareMovement moveDirection)
+
+/**
+* @brief State: emergency stop. Will immidiately stop motors, and clear order queue. If at a floor, will open doors. Goes into idle or idleBetweenFloors.
+*
+* @param
+*
+* @return void function
+**/
+void s_emergencyStop(int floor, HardwareMovement moveDirection)
+
+/**
+* @brief State: obstruction. Something is blocking the door, will keep doors open until this is okay.
+*
+* @param
+*
+* @return void function
+**/
+void s_obstruction(int floor, HardwareMovement moveDirection)
+
+/**
+* @brief State: idle between floors. Behaves like idle, only in between floors.
+*
+* @param
+*
+* @return void function
+**/
+void s_idleInBetweenFloors(int floor, HardwareMovement moveDirection)

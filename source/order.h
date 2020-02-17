@@ -20,7 +20,7 @@ struct Order {
  *
  * @return 0 on success. Non-zero for failure.
  */
-struct Order order_init(int floor, HardwareOrder order_type);
+void order_init(struct Order order, int floor, HardwareOrder order_type);
 
 /**
  * @brief Turns off corresponing light.

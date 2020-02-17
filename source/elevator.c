@@ -4,6 +4,7 @@
 #include "order.h"
 #include "order_queue.h"
 #include "elevator.h"
+#include <time.h>
 
 
 
@@ -23,21 +24,17 @@ int main(){
 
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){
         if (hardware_read_floor_sensor(i)){
-            s_idle(i,initialMovement,/*order?*/);
+            s_idle(i,initialMovement);
         }
     }
 }
 
 
 
-
-
-
-
-//state, bare uten rare-case obstruksjon
-void s_idle(int floor, HardwareMovement moveDirection, struct Order firstOrder){
+void s_idle(int floor, HardwareMovement moveDirection){
 
     int currentFloor = floor;
+    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
     HardwareMovement currentMoveDirection = moveDirection;
 
     while(1){
@@ -45,109 +42,214 @@ void s_idle(int floor, HardwareMovement moveDirection, struct Order firstOrder){
             s_emergencyStop(currentFloor,currentMoveDirection);
         }
 
-        elevator_checkAndAddOrder(currentFloor, moveDirection);
+        elevator_checkAndAddOrder(currentFloor, currentMoveDirection);
 
         if (!order_queue_empty) {
 
-            struct Order firstOrder = order_queue[0];
+            struct Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
 
             if(firstOrder.floor < currentFloor){
-                s_movingDown(currentFloor, HARDWARE_MOVEMENT_DOWN,firstOrder); //hardkodet movement?
+                s_movingDown(currentFloor, HARDWARE_MOVEMENT_DOWN);
             } else if (firstOrder.floor > currentFloor){
-                s_movingUp(currentFloor, HARDWARE_MOVEMENT_UP,firstOrder); //hardkodet movement?
+                s_movingUp(currentFloor, HARDWARE_MOVEMENT_UP);
+            } else if (firstOrder.floor == currentFloor){ //"enter elevator"
+                s_handleOrder(currentFloor, currentMoveDirection);
             }
         }
     }
 }
 
-void s_movingDown(int floor, HardwareMovement moveDirection, struct Order firstOrder){
+void s_movingDown(int floor, HardwareMovement moveDirection){
 
     int currentFloor = floor;
     hardware_command_movement(moveDirection);
     HardwareMovement currentMoveDirection = moveDirection;
-    int targetFloor = firstOrder.floor;
+    int targetFloor = order_queue[0].floor;
     
     while(1){
         if (hardware_read_stop_signal()) {
-            s_emergencyStop();
+            s_emergencyStop(currentFloor,currentMoveDirection);
         }
 
-        elevator_checkAndAddOrder(currentFloor, moveDirection);
+        elevator_checkAndAddOrder(currentFloor, currentMoveDirection);
         
+        //new target?
+        targetFloor = order_queue[0].floor;
+
+        if (elevator_amIAtFloor(targetFloor)) {
+            s_handleOrder(targetFloor, currentMoveDirection);
+        }
+    }
+}
+
+
+void s_movingUp(int floor, HardwareMovement moveDirection){
+
+    int currentFloor = floor;
+    hardware_command_movement(moveDirection);
+    HardwareMovement currentMoveDirection = moveDirection;
+    int targetFloor = order_queue[0].floor;
+    
+    while(1){
+        if (hardware_read_stop_signal()) {
+            s_emergencyStop(currentFloor,currentMoveDirection);
+        }
+        
+        elevator_checkAndAddOrder(currentFloor, moveDirection);
+
         //new target?
         order_queue[0].floor = targetFloor;
 
         if (elevator_amIAtFloor(targetFloor)) {
-            s_handleOrder(targetFloor, HARDWARE_MOVEMENT_STOP, firstOrder);
+            s_handleOrder(targetFloor, currentMoveDirection);
         }
     }
 }
 
 
-void s_movingUp(int floor, HardwareMovement moveDirection, struct Order firstOrder){
-
+void s_handleOrder(int floor, HardwareMovement moveDirection) {
     int currentFloor = floor;
-    hardware_command_movement(moveDirection);
-    HardwareMovement currentMoveDirection = moveDirection;
-    int targetFloor = firstOrder.floor;
-    
-    while(1){
-        if (hardware_read_stop_signal()) {
-            s_emergencyStop();
-        }
+    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    HardwareMovement lastMoveDirection = moveDirection;
+
+    int threeSeconds = 3000;
+    time_t startTime = clock();
+
+    while (startTime + threeSeconds >= clock()) {
+        hardware_command_door_open(1);
         
-        elevator_checkAndAddOrder(currentFloor, moveDirection);
-
-        //new target?
-        order_queue[0].floor = targetFloor;
-
-        if (elevator_reachedDestinationYet(targetFloor)) {
-            s_handleOrder(targetFloor, HARDWARE_MOVEMENT_STOP, firstOrder);
+        //need to check for things
+        elevator_checkAndAddOrder(currentFloor, lastMoveDirection);
+        if (hardware_read_stop_signal()) {
+            s_emergencyStop(currentFloor, lastMoveDirection);
+        }
+        if (hardware_read_obstruction_signal()) {
+            s_obstruction(currentFloor, lastMoveDirection);
         }
     }
+    order_queue_shift();
+    hardware_command_door_open(0);
+    s_idle(currentFloor, lastMoveDirection);
+
 }
 
 
-void s_emergencyStop(int floor, HardwareMovement moveDirection, struct Order firstOrder){
+void s_emergencyStop(int floor, HardwareMovement moveDirection){
 
     int currentFloor = floor;
     hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    HardwareMovement lastMoveDirection = moveDirection;
     
-    while(1){
+    order_queue_clear();
+
+    while(hardware_read_stop_signal()){
         
         if (elevator_amIAtFloor(currentFloor)) {
             //then you are on a floor, and must open doors.
-
+            hardware_command_door_open(1);
+            
         } else {
             //then you are in the middle of floors, with currentFloor as the last floor you were at, going in movementDirection. Must close doors.
+            hardware_command_door_open(0);
+        }
+    }
+    
+    //exit actions
+    if (elevator_amIAtFloor(currentFloor)) {
+        //create 3 sec timer. remember to check for obstruction.
+        int threeSeconds = 3000;
+        time_t startTime = clock();
 
+        while (startTime + threeSeconds >= clock()) {
+            hardware_command_door_open(1);
+            
+            //need to check for things
+            elevator_checkAndAddOrder(currentFloor,lastMoveDirection);
+            if (hardware_read_stop_signal()) {
+                s_emergencyStop(currentFloor,lastMoveDirection);
+            }
+            if (hardware_read_obstruction_signal()) {
+                s_obstruction(currentFloor,lastMoveDirection);
+            }
         }
 
+        hardware_command_door_open(0);
+        s_idle(currentFloor,lastMoveDirection);
+
+    } else {
+        //ready, in the middle of floors; dont need to worry about doors.
+        s_idleInBetweenFloors(currentFloor,lastMoveDirection);
+
+    }
+}
+
+void s_obstruction(int floor, HardwareMovement moveDirection){
+
+    int currentFloor = floor;
+    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    HardwareMovement lastMoveDirection = moveDirection;
+    
+    while(hardware_read_obstruction_signal()){
+        hardware_command_door_open(1);
+    }
+    
+    //exit actions
+    //create 3 sec timer. remember to check for obstruction.
+    int threeSeconds = 3000;
+    time_t startTime = clock();
+
+    while (startTime + threeSeconds >= clock()) {
+        hardware_command_door_open(1);
+
+        //need to check for things
+        elevator_checkAndAddOrder(currentFloor,lastMoveDirection);
         if (hardware_read_stop_signal()) {
-            s_emergencyStop();
+            s_emergencyStop(currentFloor,lastMoveDirection);
+        }
+        if (hardware_read_obstruction_signal()) {
+            s_obstruction(currentFloor,lastMoveDirection);
+        }
+    }
 
-        } else {
-            //stop signal released. 
+    hardware_command_door_open(0);
+    s_idle(currentFloor,lastMoveDirection);
+}
 
-            if (elevator_amIAtFloor(currentFloor)) {
-                //create 3 sec timer. remember to check for obstruction.
-                s_idle();
 
+s_idleInBetweenFloors(int floor, HardwareMovement moveDirection){
+    int lastFloor = floor;
+    HardwareMovement lastMoveDirection = moveDirection;
+
+    while(1) {
+        elevator_checkAndAddOrder(lastFloor, lastMoveDirection);
+
+        if (hardware_read_stop_signal()) {
+            s_emergencyStop(lastFloor, lastMoveDirection);
+        }
+
+        if (!order_queue_empty) {
+
+            struct Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
+
+            if(firstOrder.floor < lastFloor){
+                s_movingDown(lastFloor, HARDWARE_MOVEMENT_DOWN);
+            } else if (firstOrder.floor > lastFloor){
+                s_movingUp(lastFloor, HARDWARE_MOVEMENT_UP);
             } else {
-                //ready, in the middle of floors; dont need to worry about doors.
-                s_idleInBetweenFloors();
-
+                //order in *your* floor, are you above or below?
+                if (lastMoveDirection == HARDWARE_MOVEMENT_UP) {
+                    s_movingDown(lastFloor, HARDWARE_MOVEMENT_DOWN);
+                }
+                else if (lastMoveDirection == HARDWARE_MOVEMENT_DOWN) {
+                    s_movingUp(lastFloor, HARDWARE_MOVEMENT_UP);
+                }
             }
-
         }
     }
 }
 
-s_idleInBetweenFloors(int floor, HardwareMovement moveDirection, struct Order firstOrder){
-    int lastFloor = floor;
-    HardwareMovement lastMoveDirection = moveDirection;
-    //whereAmI?
-}
+
+
 
 
 int elevator_amIAtFloor(targetFloor){
@@ -161,19 +263,20 @@ int elevator_amIAtFloor(targetFloor){
 
 
 void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection){
-    struct Order* order;
+    struct Order *order;
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){
         if (hardware_read_order(i, HARDWARE_ORDER_UP)){
-            order.order_init(i,HARDWARE_ORDER_UP);
-            order_queue_add_order(order,currentFloor,moveDirection);
+            order_init(*order,i,HARDWARE_ORDER_UP);
+            order_queue_add_order(*order,currentFloor,moveDirection);
         }
         if (hardware_read_order(i, HARDWARE_ORDER_DOWN)){
-            order.order_init(i,HARDWARE_ORDER_DOWN);
-            order_queue_add_order(order,currentFloor,moveDirection);
+            order_init(*order,i,HARDWARE_ORDER_DOWN);
+            order_queue_add_order(*order,currentFloor,moveDirection);
         }
         if (hardware_read_order(i, HARDWARE_ORDER_INSIDE)){
-            order.order_init(i,HARDWARE_ORDER_INSIDE);
-            order_queue_add_order(order,currentFloor,moveDirection);
+            order_init(*order,i,HARDWARE_ORDER_INSIDE);
+            order_queue_add_order(*order,currentFloor,moveDirection);
         }
     }
 }
+
