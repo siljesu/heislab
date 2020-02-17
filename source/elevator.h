@@ -32,7 +32,14 @@ void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection)
 **/
 int elevator_amIAtFloor(int targetFloor);
 
-
+/**
+* @brief Checks if new floor is reached.
+*
+* @param targetFloor The last floor you visited
+*
+* @return returns new floor if new signal is read, returns old floor if no new signals are read.
+**/
+int elevator_findCurrentFloor(int lastFloor)
 
 
 

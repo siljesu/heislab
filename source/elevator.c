@@ -14,6 +14,7 @@ static void sigint_handler(int sig){
     exit(0);
 }
 
+
 int main(){
     int error = hardware_init();
     if(error != 0){
@@ -21,15 +22,13 @@ int main(){
         exit(1);
     }
 
+    hardware_command_clear_all_order_lights();
     signal(SIGINT, sigint_handler);
 
     int local_queue_size = 12;
     for (int i = 0; i < (local_queue_size - 1); i++){
         order_queue[i].emptyOrder = true;
     }
-
-
-
 
     //start at valid state?
     HardwareMovement initialMovement = HARDWARE_MOVEMENT_DOWN;
@@ -39,6 +38,7 @@ int main(){
         for (int i = 0; i < NUMBER_OF_FLOORS; i++){
             if (hardware_read_floor_sensor(i)){
                 hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+                //hardware_command_floor_indicator_on(i);
                 s_idle(i,initialMovement);
             }
         }        
@@ -51,7 +51,8 @@ int main(){
 void s_idle(int floor, HardwareMovement moveDirection){
 
     int currentFloor = floor;
-    //hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    hardware_command_floor_indicator_on(currentFloor);
     HardwareMovement currentMoveDirection = moveDirection;
 
     while(1){
@@ -65,7 +66,7 @@ void s_idle(int floor, HardwareMovement moveDirection){
 
             struct Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
 
-            if(firstOrder.floor < currentFloor){
+            if (firstOrder.floor < currentFloor){
                 s_movingDown(currentFloor, HARDWARE_MOVEMENT_DOWN);
             } else if (firstOrder.floor > currentFloor){
                 s_movingUp(currentFloor, HARDWARE_MOVEMENT_UP);
@@ -89,6 +90,8 @@ void s_movingDown(int floor, HardwareMovement moveDirection){
         }
 
         elevator_checkAndAddOrder(currentFloor, currentMoveDirection);
+
+        currentFloor = elevator_findCurrentFloor(currentFloor);
         
         //new target?
         targetFloor = order_queue[0].floor;
@@ -114,8 +117,10 @@ void s_movingUp(int floor, HardwareMovement moveDirection){
         
         elevator_checkAndAddOrder(currentFloor, moveDirection);
 
+        currentFloor = elevator_findCurrentFloor(currentFloor);
+
         //new target?
-        order_queue[0].floor = targetFloor;
+        targetFloor = order_queue[0].floor;
 
         if (elevator_amIAtFloor(targetFloor)) {
             s_handleOrder(targetFloor, currentMoveDirection);
@@ -127,12 +132,13 @@ void s_movingUp(int floor, HardwareMovement moveDirection){
 void s_handleOrder(int floor, HardwareMovement moveDirection) {
     int currentFloor = floor;
     hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    hardware_command_floor_indicator_on(currentFloor);
     HardwareMovement lastMoveDirection = moveDirection;
 
     int threeSeconds = 3000;
-    time_t startTime = clock();
+    time_t startTime = clock() * 1000 / CLOCKS_PER_SEC;
 
-    while (startTime + threeSeconds >= clock()) {
+    while (startTime + threeSeconds >= clock()* 1000 / CLOCKS_PER_SEC) {
         hardware_command_door_open(1);
         
         //need to check for things
@@ -144,7 +150,9 @@ void s_handleOrder(int floor, HardwareMovement moveDirection) {
             s_obstruction(currentFloor, lastMoveDirection);
         }
     }
+
     order_queue_shift();
+
     hardware_command_door_open(0);
     s_idle(currentFloor, lastMoveDirection);
 
@@ -160,6 +168,8 @@ void s_emergencyStop(int floor, HardwareMovement moveDirection){
     order_queue_clear();
 
     while(hardware_read_stop_signal()){
+
+        hardware_command_stop_light(1);
         
         if (elevator_amIAtFloor(currentFloor)) {
             //then you are on a floor, and must open doors.
@@ -175,9 +185,9 @@ void s_emergencyStop(int floor, HardwareMovement moveDirection){
     if (elevator_amIAtFloor(currentFloor)) {
         //create 3 sec timer. remember to check for obstruction.
         int threeSeconds = 3000;
-        time_t startTime = clock();
+        time_t startTime = clock() * 1000/ CLOCKS_PER_SEC;
 
-        while (startTime + threeSeconds >= clock()) {
+        while (startTime + threeSeconds >= clock()* 1000 / CLOCKS_PER_SEC) {
             hardware_command_door_open(1);
             
             //need to check for things
@@ -213,9 +223,9 @@ void s_obstruction(int floor, HardwareMovement moveDirection){
     //exit actions
     //create 3 sec timer. remember to check for obstruction.
     int threeSeconds = 3000;
-    time_t startTime = clock();
+    time_t startTime = clock() * 1000/ CLOCKS_PER_SEC;
 
-    while (startTime + threeSeconds >= clock()) {
+    while (startTime + threeSeconds >= clock()* 1000 / CLOCKS_PER_SEC) {
         hardware_command_door_open(1);
 
         //need to check for things
@@ -266,8 +276,15 @@ void s_idleInBetweenFloors(int floor, HardwareMovement moveDirection){
 }
 
 
-
-
+int elevator_findCurrentFloor(int lastFloor){
+    for (int f = 0; f < NUMBER_OF_FLOORS; f++){
+        if (hardware_read_floor_sensor(f)){
+            hardware_command_floor_indicator_on(f);
+            return f;
+        }
+    }
+    return lastFloor;
+}
 
 int elevator_amIAtFloor(int targetFloor){
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){

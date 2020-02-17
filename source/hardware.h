@@ -40,6 +40,13 @@ typedef enum {
 int hardware_init();
 
 /**
+ * @brief clears all order lights.
+ *
+ * @return void function.
+ */
+static void hardware_command_clear_all_order_lights()
+
+/**
  * @brief Commands the elevator to either move up or down,
  * or commands it to halt.
  *
