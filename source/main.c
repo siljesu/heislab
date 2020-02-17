@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "hardware.h"
 //#include "order.h"
-//#include "order_queue.h"
+#include "order_queue.h"
 
 int main(){
     int error = hardware_init();
