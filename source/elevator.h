@@ -7,9 +7,6 @@
 //#include "order.h"
 #include "order_queue.h"
 
-#define NUMBER_OF_FLOORS 4
-
-
 /**
 * @brief state function pointer typedefed. 
 * 

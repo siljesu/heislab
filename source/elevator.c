@@ -4,6 +4,9 @@
 #include <time.h>
 #include <signal.h>
 
+int NUMBER_OF_FLOORS = 4;
+
+
 static void sigint_handler(int sig){
     (void)(sig);
     printf("Terminating elevator\n");
@@ -20,16 +23,27 @@ int main(){
 
     signal(SIGINT, sigint_handler);
 
+    int local_queue_size = 12;
+    for (int i = 0; i < (local_queue_size - 1); i++){
+        order_queue[i].emptyOrder = true;
+    }
+
+
+
 
     //start at valid state?
     HardwareMovement initialMovement = HARDWARE_MOVEMENT_DOWN;
     hardware_command_movement(initialMovement);
 
-    for (int i = 0; i < NUMBER_OF_FLOORS; i++){
-        if (hardware_read_floor_sensor(i)){
-            s_idle(i,initialMovement);
-        }
+    while(1){
+        for (int i = 0; i < NUMBER_OF_FLOORS; i++){
+            if (hardware_read_floor_sensor(i)){
+                hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+                s_idle(i,initialMovement);
+            }
+        }        
     }
+
 }
 
 
@@ -37,7 +51,7 @@ int main(){
 void s_idle(int floor, HardwareMovement moveDirection){
 
     int currentFloor = floor;
-    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    //hardware_command_movement(HARDWARE_MOVEMENT_STOP);
     HardwareMovement currentMoveDirection = moveDirection;
 
     while(1){

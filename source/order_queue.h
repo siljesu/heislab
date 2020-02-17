@@ -3,10 +3,8 @@
  * @brief Order queue functionality
  *
  */
-
 #include "order.h"
 #include <stdbool.h> //Exists in order.h. Remove once merged properly
-#define QUEUE_SIZE 12
 
 /**
  * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132

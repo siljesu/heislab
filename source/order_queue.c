@@ -1,6 +1,8 @@
 #include <stdio.h> //undersøk om nødvendig å inkludere
 #include "order_queue.h"
 
+int QUEUE_SIZE = 12;
+
 void order_queue_clear(){
 	for (int i = 0; i < QUEUE_SIZE ; i++){
 		order_delete(order_queue[i]);
@@ -46,7 +48,7 @@ void order_queue_sort_incrementally(struct Order* temp_array, bool increasing){
 
 }
 
-
+//ADD FUNCTIONALITY TO MAKE SURE LAST ORDERS ARE EMPTY ORDERS
 void order_queue_sortChunksByDirection(struct Order* going_up, 
 										struct Order* going_down, struct Order* other,
 										int count_up, int count_down, int count_other, 
@@ -126,22 +128,23 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 	int count_other = 0;
 
 	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
+		if ((order_queue + i)->emptyOrder == false){
+			if ( ((order_queue + i)->floor >= elevator_floor ) 
+			&& ((order_queue + i)->order_type == (HARDWARE_ORDER_UP || HARDWARE_ORDER_INSIDE)) ){//Covers all orders to be adressed on the way up
+				going_up[count_up] = *(order_queue + i);
+				count_up++;
+			}
 
-		if ( ((order_queue + i)->floor >= elevator_floor ) 
-		&& ((order_queue + i)->order_type == (HARDWARE_ORDER_UP || HARDWARE_ORDER_INSIDE)) ){//Covers all orders to be adressed on the way up
-			going_up[count_up] = *(order_queue + i);
-			count_up++;
-		}
+			else if ( ((order_queue + i)->floor <= elevator_floor ) 
+			&& ((order_queue + i)->order_type == (HARDWARE_ORDER_DOWN || HARDWARE_ORDER_INSIDE)) ){
+				going_down[count_down] = *(order_queue + i);
+				count_down++;
+			}
 
-		else if ( ((order_queue + i)->floor <= elevator_floor ) 
-		&& ((order_queue + i)->order_type == (HARDWARE_ORDER_DOWN || HARDWARE_ORDER_INSIDE)) ){
-			going_down[count_down] = *(order_queue + i);
-			count_down++;
-		}
-
-		else {
-			other[count_other] = *(order_queue + i);
-			count_other++;
+			else {
+				other[count_other] = *(order_queue + i);
+				count_other++;
+			}
 		}
 	}
 	order_queue_sortChunksByDirection(going_up, going_down, other, count_up, count_down, count_other, elevator_floor, direction);
@@ -150,7 +153,7 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 
 int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovement direction){
 	//Adds current order at _end_ of queue, before sorting
-	*(order_queue + 11) = *order;
+	*(order_queue + (QUEUE_SIZE - 1)) = *order;
 
 	order_queue_sortOrderQueue(elevator_floor, direction);
 	return 0;
