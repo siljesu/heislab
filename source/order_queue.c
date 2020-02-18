@@ -10,6 +10,16 @@ void order_queue_clear(){
 	}
 }
 
+
+int order_queue_empty(){
+	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
+		if (!order_queue[i].emptyOrder){
+			return 0;
+		}
+	}
+	return 1;
+}
+
 void order_queue_shift(){
 	order_turn_off_light(order_queue[0]);
 	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
@@ -50,9 +60,9 @@ void order_queue_sort_incrementally(Order* temp_array, bool increasing){
 }
 
 //ADD FUNCTIONALITY TO MAKE SURE LAST ORDERS ARE EMPTY ORDERS
-void order_queue_sortChunksByDirection(Order* going_up, 
+void order_queue_sortChunksByDirection(Order* front, Order* going_up, 
 										Order* going_down, Order* other,
-										int count_up, int count_down, int count_other, 
+										int count_front, int count_up, int count_down, int count_other, 
 										int elevator_floor, HardwareMovement direction){
 
 	order_queue_sort_incrementally(going_up, true); //sorting incrementally
@@ -68,22 +78,35 @@ void order_queue_sortChunksByDirection(Order* going_up,
 		}
 	}
 */
+	int offset = 0;
+	int end_border = count_front;
+
+	for (int i = 0; i < end_border; i++){
+		order_queue[i] = front[i];
+	}
 
 	switch(direction) {
 		case HARDWARE_MOVEMENT_UP:
 
 			order_queue_sort_incrementally(other, true); //sorting incrementally
-
-			for (int i = 0; i < count_up; i++){
-				order_queue[i] = going_up[i];
+			offset = count_front;
+			end_border += count_up;
+			for (int i = offset; i < end_border; i++){
+				order_queue[i] = going_up[i - offset];
 			}
-			for (int i = count_down; i < (count_up + count_down); i++){
-				order_queue[i] = going_down[i - count_up];
+			offset += count_up;
+			end_border += count_down;
+			for (int i = offset; i < end_border; i++){
+				order_queue[i] = going_down[i - offset];
 			}
-			for (int i = (count_up + count_down); i < (count_up + count_down + count_other); i++){
-				order_queue[i] = other[i - (count_up + count_down)];
+			offset += count_down;
+			end_border += count_other;
+			for (int i = offset; i < end_border; i++){
+				order_queue[i] = other[i - offset];
 			}
-			for (int i = (count_up + count_down + count_other); i < (QUEUE_SIZE - 1); i++){
+			offset += count_other;
+			end_border = QUEUE_SIZE - 1;
+			for (int i = offset; i < end_border; i++){
 				order_queue[i].emptyOrder = true;
 			}
 			break;
@@ -91,17 +114,24 @@ void order_queue_sortChunksByDirection(Order* going_up,
 		case HARDWARE_MOVEMENT_DOWN:
 
 			order_queue_sort_incrementally(other, false); //sorting decrementally
-
-			for (int i = 0; i < count_down; i++){
-				order_queue[i] = going_down[i];
+			offset = count_front;
+			end_border += count_down;
+			for (int i = offset; i < end_border; i++){
+				order_queue[i] = going_up[i - offset];
 			}
-			for (int i = count_down; i < (count_down + count_up); i++){
-				order_queue[i] = going_up[i - count_down];
+			offset += count_down;
+			end_border += count_up;
+			for (int i = offset; i < end_border; i++){
+				order_queue[i] = going_down[i - offset];
 			}
-			for (int i = (count_down + count_up); i < (count_down + count_up + count_other); i++){
-				order_queue[i] = other[i - (count_up + count_down)];
+			offset += count_up;
+			end_border += count_other;
+			for (int i = offset; i < end_border; i++){
+				order_queue[i] = other[i - offset];
 			}
-			for (int i = (count_down + count_up + count_other); i < (QUEUE_SIZE - 1); i++){
+			offset += count_other;
+			end_border = QUEUE_SIZE - 1;
+			for (int i = offset; i < end_border; i++){
 				order_queue[i].emptyOrder = true;
 			}
 			break;
@@ -120,24 +150,38 @@ void order_queue_sortChunksByDirection(Order* going_up,
 
 void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 
+	Order front[QUEUE_SIZE];
 	Order going_up[QUEUE_SIZE]; //Set to QUEUE_SIZE for redundancy, rather than limitation
 	Order going_down[QUEUE_SIZE];
 	Order other[QUEUE_SIZE];
 
+	int count_front = 0;
 	int count_up = 0;
 	int count_down = 0;
 	int count_other = 0;
 
 	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
 		if ((order_queue + i)->emptyOrder == false){
-			if ( ((order_queue + i)->floor >= elevator_floor ) 
-			&& ((order_queue + i)->order_type == (HARDWARE_ORDER_UP || HARDWARE_ORDER_INSIDE)) ){//Covers all orders to be adressed on the way up
+			if ((order_queue + i)->floor == elevator_floor){
+				front[count_front] = *(order_queue + i);
+				count_front++;
+			}
+
+			else if ((order_queue + i)->order_type == HARDWARE_ORDER_UP){
+				going_up[count_up] = *(order_queue + i);
+				count_up++;
+			}
+			else if (  ((order_queue + i)->order_type == HARDWARE_ORDER_INSIDE) 
+					&& ((order_queue + i)->floor > elevator_floor) ){
 				going_up[count_up] = *(order_queue + i);
 				count_up++;
 			}
 
-			else if ( ((order_queue + i)->floor <= elevator_floor ) 
-			&& ((order_queue + i)->order_type == (HARDWARE_ORDER_DOWN || HARDWARE_ORDER_INSIDE)) ){
+			else if ((order_queue + i)->order_type == HARDWARE_ORDER_DOWN){
+				going_down[count_down] = *(order_queue + i);
+			}
+			else if (  ((order_queue + i)->order_type == HARDWARE_ORDER_INSIDE) 
+					&& ((order_queue + i)->floor < elevator_floor) ){
 				going_down[count_down] = *(order_queue + i);
 				count_down++;
 			}
@@ -148,7 +192,7 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 			}
 		}
 	}
-	order_queue_sortChunksByDirection(going_up, going_down, other, count_up, count_down, count_other, elevator_floor, direction);
+	order_queue_sortChunksByDirection(front, going_up, going_down, other, count_front, count_up, count_down, count_other, elevator_floor, direction);
 }
 
 
@@ -158,12 +202,4 @@ int order_queue_add_order(Order* order, int elevator_floor, HardwareMovement dir
 
 	order_queue_sortOrderQueue(elevator_floor, direction);
 	return 0;
-}
-
-int order_queue_empty(){
-	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
-		if (!order_queue[i].emptyOrder)
-			return 0;
-	}
-	return 1;
 }
