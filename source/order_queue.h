@@ -31,15 +31,10 @@ void order_queue_shift();
  */
 void order_queue_sort_incrementally(Order* temp_array, bool increasing);
 
-
-
  /** 
  * @brief Receives "chunks" of sorted arrays, divided by direction. Sorts these in sequence, based on direction.
  */
-void order_queue_sortChunksByDirection(Order* going_up, 
-										Order* going_down, Order* other,
-										int count_up, int count_down, int count_other, 
-										int elevator_floor, HardwareMovement direction);
+void order_queue_sortChunksByDirection(Order* going_up,Order* going_down,Order* second_going_up,Order* second_going_down,int count_up,int count_down,int count_second_up,int count_second_down,int elevator_floor,HardwareMovement direction);
 
 /**
  * @brief Sorts entire order queue, based on direction
