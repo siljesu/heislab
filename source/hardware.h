@@ -44,7 +44,7 @@ int hardware_init();
  *
  * @return void function.
  */
-static void hardware_command_clear_all_order_lights()
+static void hardware_command_clear_all_order_lights();
 
 /**
  * @brief Commands the elevator to either move up or down,

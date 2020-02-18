@@ -1,5 +1,5 @@
 #include <stdio.h> //undersøk om nødvendig å inkludere
-#include "order_queue.h"
+#include "new_order_queue_test.h"
 
 int QUEUE_SIZE = 12;
 
@@ -71,7 +71,16 @@ void order_queue_sortChunksByDirection(Order* going_up,Order* going_down,Order* 
 	order_queue_sort_incrementally(going_down, false); //sorting decrementally
 	order_queue_sort_incrementally(second_going_up, true); //sorting incrementally
 	order_queue_sort_incrementally(second_going_down, false); //sorting decrementally
-
+/*
+	if(HardwareMovement == HARDWARE_MOVEMENT_STOP){
+		if (order_queue->floor > elevator_floor){
+			direction = HARDWARE_MOVEMENT_UP;
+		}
+		else if (order_queue->floor < elevator_floor){
+			direction = HARDWARE_MOVEMENT_DOWN;
+		}
+	}
+*/
 	int offset = 0;
     int end_border;
 
@@ -153,6 +162,11 @@ void order_queue_sortChunksByDirection(Order* going_up,Order* going_down,Order* 
 				printf("ERROR: faulty floor order");
 			}
 			break;
+
+//		case HARDWARE_MOVEMENT_STOP:
+//			//Queue should already be cleared if elevator has stopped. Consequently, the order placed is the only possible one.
+//			order_queue[0] = *order;
+//			break;
 	}
 }
 
@@ -202,10 +216,56 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 	order_queue_sortChunksByDirection(going_up, going_down, second_going_up, second_going_down, count_up, count_down, count_second_up, count_second_down, elevator_floor, direction);
 }
 
+
 int order_queue_add_order(Order* order, int elevator_floor, HardwareMovement direction){
 	order_queue[QUEUE_SIZE-1] = order_copy(*order);
 	order_queue_sortOrderQueue(elevator_floor, direction);
 	//need to delete added and sorted order. how?
 	order_queue[QUEUE_SIZE-1] = emptyOrder;
 	return 0;
+}
+
+
+int main(){
+
+	for (int i = 0; i < 12; i++) {
+		order_queue[i] = order_copy(emptyOrder);
+	}
+	
+
+	for (int i = 0; i < QUEUE_SIZE; i++){
+		going_up[i] = order_copy(emptyOrder);
+		going_down[i] = order_copy(emptyOrder);
+		second_going_up[i] = order_copy(emptyOrder);
+		second_going_down[i] = order_copy(emptyOrder);
+	}
+
+	p_testOrder->floor = 4;
+	p_testOrder->order_type = HARDWARE_ORDER_DOWN;
+	p_testOrder->emptyOrder = false;
+	order_queue_add_order(p_testOrder, 3, HARDWARE_MOVEMENT_DOWN);
+
+	p_testOrder2->floor = 1;
+	p_testOrder2->order_type = HARDWARE_ORDER_UP;
+	p_testOrder2->emptyOrder = false;
+	order_queue_add_order(p_testOrder2, 3, HARDWARE_MOVEMENT_DOWN);
+
+	p_testOrder3->floor = 3;
+	p_testOrder3->order_type = HARDWARE_ORDER_INSIDE;
+	p_testOrder3->emptyOrder = false;
+	order_queue_add_order(p_testOrder3, 3, HARDWARE_MOVEMENT_DOWN);
+
+	p_testOrder4->floor = 2;
+	p_testOrder4->order_type = HARDWARE_ORDER_UP;
+	p_testOrder4->emptyOrder = false;
+	order_queue_add_order(p_testOrder4, 3, HARDWARE_MOVEMENT_DOWN);
+
+	//((OH NO! THERE IS NO CHECK FOR VALID ORDERS: CORRECTION: IN REAL LIFE THERE IS.))
+	//TEST THOROUGHLY NON-STATIC FLOORS!! 
+	p_testOrder5->floor = 1;
+	p_testOrder5->order_type = HARDWARE_ORDER_INSIDE;
+	p_testOrder5->emptyOrder = false;
+	order_queue_add_order(p_testOrder5, 3, HARDWARE_MOVEMENT_DOWN);
+
+
 }

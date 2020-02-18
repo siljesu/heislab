@@ -7,13 +7,13 @@
 #include "hardware.h"
 #include <stdbool.h>
 
-typedef struct {
+typedef struct{
 
     int floor;
     HardwareOrder order_type;
     bool emptyOrder;
 
-} Order;
+}Order;
 
 /**
  * @brief Initializes valid order.
