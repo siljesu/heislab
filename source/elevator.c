@@ -64,7 +64,7 @@ void s_idle(int floor, HardwareMovement moveDirection){
 
         if (!order_queue_empty()) {
 
-            Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
+            Order firstOrder = order_copy(order_queue[0]);
 
             if (firstOrder.floor < currentFloor){
                 s_movingDown(currentFloor, HARDWARE_MOVEMENT_DOWN);
