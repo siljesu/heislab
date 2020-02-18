@@ -3,6 +3,8 @@
 #include "elevator.h"
 #include <time.h>
 #include <signal.h>
+#include "order_queue.h"
+#include "order.h"
 
 int NUMBER_OF_FLOORS = 4;
 
@@ -37,8 +39,6 @@ int main(){
     while(1){
         for (int i = 0; i < NUMBER_OF_FLOORS; i++){
             if (hardware_read_floor_sensor(i)){
-                hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-                //hardware_command_floor_indicator_on(i);
                 s_idle(i,initialMovement);
             }
         }        
@@ -64,7 +64,7 @@ void s_idle(int floor, HardwareMovement moveDirection){
 
         if (!order_queue_empty()) {
 
-            struct Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
+            Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
 
             if (firstOrder.floor < currentFloor){
                 s_movingDown(currentFloor, HARDWARE_MOVEMENT_DOWN);
@@ -256,7 +256,7 @@ void s_idleInBetweenFloors(int floor, HardwareMovement moveDirection){
 
         if (!order_queue_empty()) {
 
-            struct Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
+            Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
 
             if(firstOrder.floor < lastFloor){
                 s_movingDown(lastFloor, HARDWARE_MOVEMENT_DOWN);
@@ -297,21 +297,21 @@ int elevator_amIAtFloor(int targetFloor){
 
 
 void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection){
-    //struct Order *order;
+    //Order *order;
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){
         if (hardware_read_order(i, HARDWARE_ORDER_UP)){
-            struct Order order = {order_init(i,HARDWARE_ORDER_UP).floor, order_init(i,HARDWARE_ORDER_UP).order_type, order_init(i,HARDWARE_ORDER_UP).emptyOrder};
-            struct Order *p_order = &order;
+            Order order = {order_init(i,HARDWARE_ORDER_UP).floor, order_init(i,HARDWARE_ORDER_UP).order_type, order_init(i,HARDWARE_ORDER_UP).emptyOrder};
+            Order *p_order = &order;
             order_queue_add_order(p_order,currentFloor,moveDirection);
         }
         else if (hardware_read_order(i, HARDWARE_ORDER_DOWN)){
-            struct Order order = {order_init(i,HARDWARE_ORDER_DOWN).floor, order_init(i,HARDWARE_ORDER_DOWN).order_type, order_init(i,HARDWARE_ORDER_DOWN).emptyOrder};
-            struct Order *p_order = &order;
+            Order order = {order_init(i,HARDWARE_ORDER_DOWN).floor, order_init(i,HARDWARE_ORDER_DOWN).order_type, order_init(i,HARDWARE_ORDER_DOWN).emptyOrder};
+            Order *p_order = &order;
             order_queue_add_order(p_order,currentFloor,moveDirection);
         }
         else if (hardware_read_order(i, HARDWARE_ORDER_INSIDE)){
-            struct Order order = {order_init(i,HARDWARE_ORDER_INSIDE).floor, order_init(i,HARDWARE_ORDER_INSIDE).order_type, order_init(i,HARDWARE_ORDER_INSIDE).emptyOrder};
-            struct Order *p_order = &order;
+            Order order = {order_init(i,HARDWARE_ORDER_INSIDE).floor, order_init(i,HARDWARE_ORDER_INSIDE).order_type, order_init(i,HARDWARE_ORDER_INSIDE).emptyOrder};
+            Order *p_order = &order;
             order_queue_add_order(p_order,currentFloor,moveDirection);
         }
     }

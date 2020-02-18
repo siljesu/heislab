@@ -14,7 +14,7 @@ bool order_table[12];
 /**
  * @brief Table to hold up to 12 orders (12 is the max possible), sorted after proximity in the elevator's current path.
  */
-struct Order order_queue[12];
+Order order_queue[12];
 
 /**
  * @brief Clears whole queue.
@@ -29,15 +29,15 @@ void order_queue_shift();
 /**
  * @brief Sorts queue, must be used when adding order.
  */
-void order_queue_sort_incrementally(struct Order* temp_array, bool increasing);
+void order_queue_sort_incrementally(Order* temp_array, bool increasing);
 
 
 
  /** 
  * @brief Receives "chunks" of sorted arrays, divided by direction. Sorts these in sequence, based on direction.
  */
-void order_queue_sortChunksByDirection(struct Order* going_up, 
-										struct Order* going_down, struct Order* other,
+void order_queue_sortChunksByDirection(Order* going_up, 
+										Order* going_down, Order* other,
 										int count_up, int count_down, int count_other, 
 										int elevator_floor, HardwareMovement direction);
 
@@ -51,7 +51,7 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction);
  *
  * @return 1 if true, 0 if false.
  */
-int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovement direction);
+int order_queue_add_order(Order* order, int elevator_floor, HardwareMovement direction);
 
 /**
  * @brief Checks if ordering queue is empty.

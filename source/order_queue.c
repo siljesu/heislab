@@ -5,7 +5,8 @@ int QUEUE_SIZE = 12;
 
 void order_queue_clear(){
 	for (int i = 0; i < QUEUE_SIZE ; i++){
-		order_delete(order_queue[i]);
+		Order emptyOrder = order_copy(order_queue[i]);
+		order_queue[i] = emptyOrder;
 	}
 }
 
@@ -19,8 +20,8 @@ void order_queue_shift(){
 	order_queue[QUEUE_SIZE - 1] = order_make_empty(order_queue[QUEUE_SIZE - 1]);
 }
 
-void order_queue_sort_incrementally(struct Order* temp_array, bool increasing){
-	struct Order temp_order;
+void order_queue_sort_incrementally(Order* temp_array, bool increasing){
+	Order temp_order;
 	
 	if (increasing){
 		temp_order = *(temp_array);
@@ -49,8 +50,8 @@ void order_queue_sort_incrementally(struct Order* temp_array, bool increasing){
 }
 
 //ADD FUNCTIONALITY TO MAKE SURE LAST ORDERS ARE EMPTY ORDERS
-void order_queue_sortChunksByDirection(struct Order* going_up, 
-										struct Order* going_down, struct Order* other,
+void order_queue_sortChunksByDirection(Order* going_up, 
+										Order* going_down, Order* other,
 										int count_up, int count_down, int count_other, 
 										int elevator_floor, HardwareMovement direction){
 
@@ -119,9 +120,9 @@ void order_queue_sortChunksByDirection(struct Order* going_up,
 
 void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 
-	struct Order going_up[QUEUE_SIZE]; //Set to QUEUE_SIZE for redundancy, rather than limitation
-	struct Order going_down[QUEUE_SIZE];
-	struct Order other[QUEUE_SIZE];
+	Order going_up[QUEUE_SIZE]; //Set to QUEUE_SIZE for redundancy, rather than limitation
+	Order going_down[QUEUE_SIZE];
+	Order other[QUEUE_SIZE];
 
 	int count_up = 0;
 	int count_down = 0;
@@ -151,7 +152,7 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 }
 
 
-int order_queue_add_order(struct Order* order, int elevator_floor, HardwareMovement direction){
+int order_queue_add_order(Order* order, int elevator_floor, HardwareMovement direction){
 	//Adds current order at _end_ of queue, before sorting
 	*(order_queue + (QUEUE_SIZE - 1)) = *order;
 
