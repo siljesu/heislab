@@ -14,6 +14,8 @@ void order_turn_off_light(Order order) {
 }
 
 Order order_make_empty(Order order) {
+    order.floor = 0;
+    order.order_type = 0;
     order.emptyOrder = true;
     return order;
 }
