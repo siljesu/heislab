@@ -7,37 +7,44 @@
 #include "hardware.h"
 #include <stdbool.h>
 
-struct Order {
+typedef struct {
 
     int floor;
     HardwareOrder order_type;
     bool emptyOrder;
 
-};
+} Order;
 
 /**
  * @brief Initializes valid order.
  *
  * @return 0 on success. Non-zero for failure.
  */
-struct Order order_init(int floor, HardwareOrder order_type);
+Order order_init(int floor, HardwareOrder order_type);
 
 /**
  * @brief Turns off corresponing light.
  *
  */
-void order_turn_off_light(struct Order order);
+void order_turn_off_light(Order order);
 
 /**
  * @brief Deactivates order by setting emptyOrder to true.
  *
  * @return returns deactivated order.
  */
-struct Order order_make_empty(struct Order order);
+Order order_make_empty(Order order);
 
 /**
  * @brief Deletes order by deactivating and turning off order light.
  *
  * @return returns deleted order.
  */
-struct Order order_delete(struct Order order);
+Order order_delete(Order order);
+
+/**
+ * @brief Copies the input order
+ *
+ * @return returns the copy
+ */
+Order order_copy(Order order);
