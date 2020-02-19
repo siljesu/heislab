@@ -7,6 +7,7 @@
 #include <stdbool.h> //Exists in order.h. Remove once merged properly
 #include "order.h"
 
+
 /**
  * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
  */
@@ -20,7 +21,7 @@ Order order_queue[12];
 /**
  * @brief A standard empty order to initialize arrays.
  */
-Order emptyOrder = {0,HARDWARE_MOVEMENT_UP,true};
+
 
 /**
  * @brief Arrays for sorting the queue.

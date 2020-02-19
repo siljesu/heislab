@@ -24,13 +24,14 @@ int main(){
     hardware_command_clear_all_order_lights();
     signal(SIGINT, sigint_handler);
 
+    Order EMPTYORDER = {0,HARDWARE_MOVEMENT_UP,true};
     int local_queue_size = 12;
     for (int i = 0; i < (local_queue_size); i++){
-        order_queue[i] = order_copy(emptyOrder);
-        going_up[i] = order_copy(emptyOrder);
-		going_down[i] = order_copy(emptyOrder);
-		second_going_up[i] = order_copy(emptyOrder);
-		second_going_down[i] = order_copy(emptyOrder);
+        order_queue[i] = order_copy(EMPTYORDER);
+        going_up[i] = order_copy(EMPTYORDER);
+		going_down[i] = order_copy(EMPTYORDER);
+		second_going_up[i] = order_copy(EMPTYORDER);
+		second_going_down[i] = order_copy(EMPTYORDER);
     }
 
     //start at valid state?
@@ -152,9 +153,9 @@ void s_handleOrder(int floor, HardwareMovement moveDirection) {
         }
     }
 
+    hardware_command_door_open(0);
     order_queue_shift();
 
-    hardware_command_door_open(0);
     s_idle(currentFloor, lastMoveDirection);
 
 }
@@ -181,6 +182,8 @@ void s_emergencyStop(int floor, HardwareMovement moveDirection){
             hardware_command_door_open(0);
         }
     }
+
+    hardware_command_stop_light(0);
     
     //exit actions
     if (elevator_amIAtFloor(currentFloor)) {

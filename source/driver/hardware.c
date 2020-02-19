@@ -1,4 +1,4 @@
-#include "hardware_test.h"
+#include "hardware.h"
 #include "channels.h"
 #include "io.h"
 
@@ -192,7 +192,7 @@ void hardware_command_order_light(int floor, HardwareOrder order_type, int on){
     }
 }
 
-static void hardware_command_clear_all_order_lights(){
+/*static*/ void hardware_command_clear_all_order_lights(){
     HardwareOrder order_types[3] = {
         HARDWARE_ORDER_UP,
         HARDWARE_ORDER_INSIDE,

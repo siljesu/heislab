@@ -2,6 +2,7 @@
 #include "order_queue.h"
 
 int QUEUE_SIZE = 12;
+Order EMPTYORDER = {0,HARDWARE_MOVEMENT_UP,true};
 
 void order_queue_clear(){
 	for (int i = 0; i < QUEUE_SIZE ; i++){
@@ -84,13 +85,13 @@ void order_queue_sortChunksByDirection(Order* going_up,Order* going_down,Order* 
 				order_queue[i] = going_up[i - offset];
 			}
 
-			offset += count_down;
+			offset += count_up;
 			end_border += count_down;
 			for (int i = offset; i < end_border; i++){
 				order_queue[i] = going_down[i - offset];
 			}
 			
-			offset += count_second_up;
+			offset += count_down;
 			end_border += count_second_up;
 			for (int i = offset; i < end_border; i++){
 				order_queue[i] = second_going_up[i - offset];
@@ -173,7 +174,7 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 						going_up[count_up] = *(order_queue + i);
 						count_up++;
 					}
-					else if (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE) || ((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN)){
+					else if ( (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) || (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN)) ){
 						going_down[count_down] = *(order_queue + i);
 						count_down++;
 					}
@@ -183,7 +184,24 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 					}
 					break;
 				case HARDWARE_ORDER_DOWN:
-					if (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE) || ((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)){
+					if ( (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) || (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)) ){
+						going_up[count_up] = *(order_queue + i);
+						count_up++;
+					}
+					else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+						going_down[count_down] = *(order_queue + i);
+						count_down++;
+					}
+					else if (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN ||(order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+						second_going_down[count_down] = *(order_queue + i);
+						count_second_down++;
+					}
+					break;
+				case HARDWARE_MOVEMENT_STOP:
+
+					printf("ERROR: logic error, movement stop should not happen here: will sort as if going down.");
+
+					if ( (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) || (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)) ){
 						going_up[count_up] = *(order_queue + i);
 						count_up++;
 					}
@@ -206,6 +224,6 @@ int order_queue_add_order(Order* order, int elevator_floor, HardwareMovement dir
 	order_queue[QUEUE_SIZE-1] = order_copy(*order);
 	order_queue_sortOrderQueue(elevator_floor, direction);
 	//need to delete added and sorted order. how?
-	order_queue[QUEUE_SIZE-1] = emptyOrder;
+	order_queue[QUEUE_SIZE-1] = EMPTYORDER;
 	return 0;
 }
