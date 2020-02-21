@@ -9,19 +9,9 @@
 
 
 /**
- * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
- */
-bool order_table[12];
-
-/**
  * @brief Table to hold up to 12 orders (12 is the max possible), sorted after proximity in the elevator's current path.
  */
 Order order_queue[12];
-
-/**
- * @brief A standard empty order to initialize arrays.
- */
-
 
 /**
  * @brief Arrays for sorting the queue.
@@ -49,7 +39,7 @@ int order_queue_empty();
 /**
  * @brief shifts every element in the order queue one place towards left
  */
-void order_queue_shift();
+void order_queue_deleteByShifting();
 
 /**
  * @brief Sorts queue, must be used when adding order.
@@ -72,3 +62,4 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction);
  * @return 1 if true, 0 if false.
  */
 int order_queue_add_order(Order* order, int elevator_floor, HardwareMovement direction);
+

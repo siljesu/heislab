@@ -2,12 +2,11 @@
 #include "order_queue.h"
 
 int QUEUE_SIZE = 12;
-Order EMPTYORDER = {0,HARDWARE_MOVEMENT_UP,true};
 
 void order_queue_clear(){
 	for (int i = 0; i < QUEUE_SIZE ; i++){
-		Order tmpOrder = order_copy(order_delete(order_queue[i]));
-		order_queue[i] = order_copy(tmpOrder);
+		order_toggle_unique(order_queue[i], 0);
+		order_queue[i] = order_delete(order_queue[i]);
 	}
 }
 
@@ -19,14 +18,13 @@ int order_queue_empty(){
 	return 1;
 }
 
-void order_queue_shift(){
-	order_turn_off_light(order_queue[0]);
+void order_queue_deleteByShifting(){
+	order_toggle_unique(order_queue[0], 0);
+	order_delete(order_queue[0]);
 	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
-		order_queue[i].floor = order_queue[i + 1].floor;
-		order_queue[i].order_type = order_queue[i + 1].order_type;
-		order_queue[i].emptyOrder = order_queue[i + 1].emptyOrder;
+		order_queue[i] = order_copy(order_queue[i+1]);
 	}
-	order_queue[QUEUE_SIZE - 1] = order_make_empty(order_queue[QUEUE_SIZE - 1]);
+	order_queue[QUEUE_SIZE - 1] = EMPTYORDER;
 }
 
 void order_queue_sort_incrementally(Order* temp_array, bool increasing){

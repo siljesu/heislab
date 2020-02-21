@@ -7,6 +7,16 @@
 #include "hardware.h"
 #include <stdbool.h>
 
+/**
+ * @brief A standard empty order to initialize arrays.
+ */
+Order EMPTYORDER = {0,HARDWARE_MOVEMENT_UP,true};
+
+/**
+ * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
+ */
+int order_table[4][3];
+
 typedef struct{
 
     int floor;
@@ -29,13 +39,6 @@ Order order_init(int floor, HardwareOrder order_type);
 void order_turn_off_light(Order order);
 
 /**
- * @brief Deactivates order by setting emptyOrder to true.
- *
- * @return returns deactivated order.
- */
-Order order_make_empty(Order order);
-
-/**
  * @brief Deletes order by deactivating and turning off order light.
  *
  * @return returns deleted order.
@@ -48,3 +51,17 @@ Order order_delete(Order order);
  * @return returns the copy
  */
 Order order_copy(Order order);
+
+/**
+ * @brief Toggles corresponding order in order_table to 1 if unique, 0 if removing order.
+ *
+ * @return none
+ */
+void order_toggle_unique(Order order, int on);
+
+/**
+ * @brief Checks if order already exists.
+ *
+ * @return returns 1 if unique, 0 if already exists.
+ */
+int order_check_unique(Order order);

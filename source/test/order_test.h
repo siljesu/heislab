@@ -29,13 +29,6 @@ Order order_init(int floor, HardwareOrder order_type);
 void order_turn_off_light(Order order);
 
 /**
- * @brief Deactivates order by setting emptyOrder to true.
- *
- * @return returns deactivated order.
- */
-Order order_make_empty(Order order);
-
-/**
  * @brief Deletes order by deactivating and turning off order light.
  *
  * @return returns deleted order.
