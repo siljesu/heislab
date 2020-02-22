@@ -7,10 +7,6 @@
 #include "hardware.h"
 #include <stdbool.h>
 
-/**
- * @brief A standard empty order to initialize arrays.
- */
-Order EMPTYORDER = {0,HARDWARE_MOVEMENT_UP,true};
 
 /**
  * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
@@ -24,6 +20,12 @@ typedef struct{
     bool emptyOrder;
 
 }Order;
+
+/**
+ * @brief A standard empty order to initialize arrays.
+ */
+static const Order EMPTYORDER = {0,HARDWARE_ORDER_UP,true};
+
 
 /**
  * @brief Initializes valid order.

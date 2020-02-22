@@ -5,9 +5,14 @@ int QUEUE_SIZE = 12;
 
 void order_queue_clear(){
 	for (int i = 0; i < QUEUE_SIZE ; i++){
-		order_toggle_unique(order_queue[i], 0);
 		order_queue[i] = order_delete(order_queue[i]);
 	}
+	for (int i = 0; i < 4; i++){ //Failsafe to be able to reset
+        for (int j = 0; j < 3; j++){
+            order_table[i][j] = 0;
+			hardware_command_order_light(i, j, 0);
+        }
+    }
 }
 
 int order_queue_empty(){
@@ -19,7 +24,6 @@ int order_queue_empty(){
 }
 
 void order_queue_deleteByShifting(){
-	order_toggle_unique(order_queue[0], 0);
 	order_delete(order_queue[0]);
 	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
 		order_queue[i] = order_copy(order_queue[i+1]);
@@ -168,30 +172,53 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 			switch (direction) {
 				case HARDWARE_MOVEMENT_UP:
 
-					if (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+					if ((order_queue + i)->floor == elevator_floor && (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE){
 						going_up[count_up] = *(order_queue + i);
 						count_up++;
 					}
-					else if ( (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) || (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN)) ){
+					else if (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+						going_up[count_up] = *(order_queue + i);
+						count_up++;
+					}
+					else if ( (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN)) ){
+						going_up[count_up] = *(order_queue + i);
+						count_up++;
+					}
+					else if ( (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) ){
 						going_down[count_down] = *(order_queue + i);
 						count_down++;
 					}
-					else if (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						second_going_up[count_down] = *(order_queue + i);
+					else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+						second_going_up[count_second_up] = *(order_queue + i);
+						count_second_up++;
+					}
+					else {
+						second_going_up[count_second_up] = *(order_queue + i);
 						count_second_up++;
 					}
 					break;
 				case HARDWARE_ORDER_DOWN:
-					if ( (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) || (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)) ){
+					if ( (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) ){
 						going_up[count_up] = *(order_queue + i);
 						count_up++;
 					}
-					else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+					else if ((order_queue + i)->floor == elevator_floor && (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE){
 						going_down[count_down] = *(order_queue + i);
 						count_down++;
 					}
-					else if (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN ||(order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						second_going_down[count_down] = *(order_queue + i);
+					else if (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+						going_down[count_down] = *(order_queue + i);
+						count_down++;
+					}
+					else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)) {
+						going_down[count_down] = *(order_queue + i);
+						count_down++;
+					}
+					else if (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN ||(order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+						second_going_down[count_second_down] = *(order_queue + i);
+						count_second_down++;
+					} else {
+						second_going_down[count_second_down] = *(order_queue + i);
 						count_second_down++;
 					}
 					break;
@@ -208,7 +235,7 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 						count_down++;
 					}
 					else if (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN ||(order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						second_going_down[count_down] = *(order_queue + i);
+						second_going_down[count_second_down] = *(order_queue + i);
 						count_second_down++;
 					}
 					break;

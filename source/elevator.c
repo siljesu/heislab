@@ -51,7 +51,7 @@ void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection)
                 order_toggle_unique(order,1);
             }
         }
-        else if (hardware_read_order(i, HARDWARE_ORDER_DOWN)){
+        if (hardware_read_order(i, HARDWARE_ORDER_DOWN)){
             Order order = {order_init(i,HARDWARE_ORDER_DOWN).floor, order_init(i,HARDWARE_ORDER_DOWN).order_type, order_init(i,HARDWARE_ORDER_DOWN).emptyOrder};
             if (order_check_unique(order)) {
                 Order *p_order = &order;
@@ -59,7 +59,7 @@ void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection)
                 order_toggle_unique(order,1);
             }
         }
-        else if (hardware_read_order(i, HARDWARE_ORDER_INSIDE)){
+        if (hardware_read_order(i, HARDWARE_ORDER_INSIDE)){
             Order order = {order_init(i,HARDWARE_ORDER_INSIDE).floor, order_init(i,HARDWARE_ORDER_INSIDE).order_type, order_init(i,HARDWARE_ORDER_INSIDE).emptyOrder};
             if (order_check_unique(order)) {
                 Order *p_order = &order;

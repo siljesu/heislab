@@ -1,6 +1,5 @@
 #include "order.h"
 
-
 Order order_init(int floor, HardwareOrder order_type) {
     Order order;
     order.floor = floor;
@@ -15,6 +14,7 @@ void order_turn_off_light(Order order) {
 }
 
 Order order_delete(Order order) {
+    order_toggle_unique(order, 0);
     order_turn_off_light(order);
     return EMPTYORDER;
 }

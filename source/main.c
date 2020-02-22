@@ -3,6 +3,7 @@
 #include <time.h>
 #include <signal.h>
 #include "elevator.h"
+#include "states.h"
 
 static void sigint_handler(int sig){
     (void)(sig);
@@ -111,11 +112,17 @@ void s_handleOrder(int floor, HardwareMovement moveDirection) {
         }
         if (hardware_read_obstruction_signal()) {
             s_obstruction(currentFloor, lastMoveDirection);
+            break;
         }
     }
 
     hardware_command_door_open(0);
     order_queue_deleteByShifting();
+    for (int i = 0; i < 2; i++) {
+        if (order_queue[0].floor == currentFloor) {
+            order_queue_deleteByShifting();
+        }
+    }
 
     s_idle(currentFloor, lastMoveDirection);
 
@@ -183,6 +190,11 @@ void s_obstruction(int floor, HardwareMovement moveDirection){
     
     while(hardware_read_obstruction_signal()){
         hardware_command_door_open(1);
+        elevator_checkAndAddOrder(currentFloor,lastMoveDirection);
+        if (hardware_read_stop_signal()) {
+            s_emergencyStop(currentFloor,lastMoveDirection);
+        }
+
     }
     
     //exit actions
@@ -195,6 +207,7 @@ void s_obstruction(int floor, HardwareMovement moveDirection){
 
         //need to check for things
         elevator_checkAndAddOrder(currentFloor,lastMoveDirection);
+
         if (hardware_read_stop_signal()) {
             s_emergencyStop(currentFloor,lastMoveDirection);
         }
@@ -204,7 +217,7 @@ void s_obstruction(int floor, HardwareMovement moveDirection){
     }
 
     hardware_command_door_open(0);
-    s_idle(currentFloor,lastMoveDirection);
+    //s_idle(currentFloor,lastMoveDirection);
 }
 
 
@@ -265,4 +278,5 @@ int main(){
         }        
     }
 
+    return 0;
 }

@@ -3,7 +3,6 @@
 * @brief elevator operations and states are in this file.
 **/
 
-#include "hardware.h"
 #include "order_queue.h"
 
 #define NUMBER_OF_FLOORS 4
