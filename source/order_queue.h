@@ -13,14 +13,10 @@
  */
 Order order_queue[12];
 
-/**
- * @brief Arrays for sorting the queue.
- */
 Order going_up[12];
 Order going_down[12];
 Order second_going_up[12]; // happens only if already going up
 Order second_going_down[12]; // happens only if already going down
-
 
 /**
  * @brief Clears whole queue.
@@ -40,6 +36,11 @@ int order_queue_empty();
  * @brief shifts every element in the order queue one place towards left
  */
 void order_queue_deleteByShifting();
+
+/**
+ * @brief shifts every element in the order queue one place towards left, from the index given
+ */
+void order_queue_deleteByShiftingAtIndex(int i);
 
 /**
  * @brief Sorts queue, must be used when adding order.

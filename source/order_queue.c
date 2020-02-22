@@ -31,6 +31,13 @@ void order_queue_deleteByShifting(){
 	order_queue[QUEUE_SIZE - 1] = EMPTYORDER;
 }
 
+void order_queue_deleteByShiftingAtIndex(int i){
+	order_delete(order_queue[i]);
+	for (int j = i; j < (QUEUE_SIZE - 1); j++){
+		order_queue[j] = order_copy(order_queue[j + 1]);
+	}
+	order_queue[QUEUE_SIZE - 1] = EMPTYORDER;
+}
 void order_queue_sort_incrementally(Order* temp_array, bool increasing){
 	Order temp_order;
 	int index;
@@ -99,6 +106,12 @@ void order_queue_sortChunksByDirection(Order* going_up,Order* going_down,Order* 
 				order_queue[i] = second_going_up[i - offset];
 			}
 			
+			offset += count_second_up; //Extra failsafe
+			end_border += count_second_down;
+			for (int i = offset; i < end_border; i++){
+				order_queue[i] = second_going_down[i - offset];
+			}
+			
 			if (count_second_down != 0) {
 				printf("ERROR: faulty floor order");
 			}
@@ -124,6 +137,12 @@ void order_queue_sortChunksByDirection(Order* going_up,Order* going_down,Order* 
 				order_queue[i] = second_going_down[i - offset];
 			}
 			
+			offset += count_second_down; //Extra failsafe
+			end_border += count_second_up;
+			for (int i = offset; i < end_border; i++){
+				order_queue[i] = second_going_up[i - offset];
+			}
+
 			if (count_second_up != 0) {
 				printf("ERROR: faulty floor order");
 			}
@@ -133,29 +152,35 @@ void order_queue_sortChunksByDirection(Order* going_up,Order* going_down,Order* 
 
 			printf("ERROR: logic error, movement stop should not happen here: will sort as if going down.");
 
-			//choosing movement down scenario just in case.
-			end_border = count_down;
+			// //choosing movement down scenario just in case.
+			// end_border = count_down;
 
-			for (int i = offset; i < end_border; i++){
-				order_queue[i] = going_down[i - offset];
-			}
+			// for (int i = offset; i < end_border; i++){
+			// 	order_queue[i] = going_down[i - offset];
+			// }
 
-			offset += count_up;
-			end_border += count_up;
-			for (int i = offset; i < end_border; i++){
-				order_queue[i] = going_up[i - offset];
-			}
+			// offset += count_up;
+			// end_border += count_up;
+			// for (int i = offset; i < end_border; i++){
+			// 	order_queue[i] = going_up[i - offset];
+			// }
 			
-			offset += count_second_down;
-			end_border += count_second_down;
-			for (int i = offset; i < end_border; i++){
-				order_queue[i] = second_going_down[i - offset];
-			}
+			// offset += count_second_down;
+			// end_border += count_second_down;
+			// for (int i = offset; i < end_border; i++){
+			// 	order_queue[i] = second_going_down[i - offset];
+			// }
 			
-			if (count_second_up != 0) {
-				printf("ERROR: faulty floor order");
-			}
+			// if (count_second_up != 0) {
+			// 	printf("ERROR: faulty floor order");
+			// }
 			break;
+	}
+	for (int i = 0; i < 12; i++){ //Hardcoded queuesize value (12)
+		going_up[i] = EMPTYORDER;
+		going_down[i] = EMPTYORDER;
+		second_going_up[i] = EMPTYORDER;
+		second_going_down[i] = EMPTYORDER;
 	}
 }
 
@@ -168,76 +193,138 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 
 	for (int i = 0; i < (QUEUE_SIZE); i++){
 		if ((order_queue + i)->emptyOrder == false){
+			int order_floor = order_queue[i].floor;
+			HardwareOrder order_type = order_queue[i].order_type;
+			int atFloor = hardware_read_floor_sensor(elevator_floor);
 
 			switch (direction) {
 				case HARDWARE_MOVEMENT_UP:
 
-					if ((order_queue + i)->floor == elevator_floor && (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE){
-						going_up[count_up] = *(order_queue + i);
-						count_up++;
+					if (atFloor){
+						//everything bigger, _including_ current floor
+						if ( (order_floor >= elevator_floor) && (order_type == HARDWARE_ORDER_UP || order_type == HARDWARE_ORDER_INSIDE) ){
+							going_up[count_up] = order_queue[i];
+							count_up++;
+						}
+						else if ( (order_type == HARDWARE_ORDER_DOWN) || ((order_floor < elevator_floor) && order_type == HARDWARE_ORDER_INSIDE) ){
+							going_down[count_down] = order_queue[i];
+							count_down++;
+						}
+						else if ( (order_floor < elevator_floor) && (order_type == HARDWARE_ORDER_UP) ){
+							second_going_up[count_second_up] = order_queue[i];
+							count_second_up++;
+						}
+					} else {
+						//everything bigger, _not including_ current floor (because elevator is inbetween floors, and current floor isn't representative)
+						if ( (order_floor > elevator_floor) && (order_type == HARDWARE_ORDER_UP || order_type == HARDWARE_ORDER_INSIDE) ){
+							going_up[count_up] = order_queue[i];
+							count_up++;
+						}
+						else if ( (order_type == HARDWARE_ORDER_DOWN) || ((order_floor <= elevator_floor) && order_type == HARDWARE_ORDER_INSIDE) ){
+							going_down[count_down] = order_queue[i];
+							count_down++;
+						}
+						else if ( (order_floor <= elevator_floor) && (order_type == HARDWARE_ORDER_UP) ){
+							second_going_up[count_second_up] = order_queue[i];
+							count_second_up++;
+						}
 					}
-					else if (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						going_up[count_up] = *(order_queue + i);
-						count_up++;
-					}
-					else if ( (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN)) ){
-						going_up[count_up] = *(order_queue + i);
-						count_up++;
-					}
-					else if ( (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) ){
-						going_down[count_down] = *(order_queue + i);
-						count_down++;
-					}
-					else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						second_going_up[count_second_up] = *(order_queue + i);
-						count_second_up++;
-					}
-					else {
-						second_going_up[count_second_up] = *(order_queue + i);
-						count_second_up++;
-					}
+					// if (order_floor == elevator_floor && order_type == HARDWARE_ORDER_INSIDE){
+					// 	going_up[count_up] = *(order_queue + i);
+					// 	count_up++;
+					// }
+					// else if (((order_floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE))){
+					// 	going_up[count_up] = *(order_queue + i);
+					// 	count_up++;
+					// }
+					// else if ( (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN)) ){
+					// 	going_up[count_up] = *(order_queue + i);
+					// 	count_up++;
+					// }
+					// else if ( (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) ){
+					// 	going_down[count_down] = *(order_queue + i);
+					// 	count_down++;
+					// }
+					// else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+					// 	second_going_up[count_second_up] = *(order_queue + i);
+					// 	count_second_up++;
+					// }
+					// else {
+					// 	second_going_up[count_second_up] = *(order_queue + i);
+					// 	count_second_up++;
+					// }
 					break;
 				case HARDWARE_ORDER_DOWN:
-					if ( (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) ){
-						going_up[count_up] = *(order_queue + i);
-						count_up++;
-					}
-					else if ((order_queue + i)->floor == elevator_floor && (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE){
-						going_down[count_down] = *(order_queue + i);
-						count_down++;
-					}
-					else if (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						going_down[count_down] = *(order_queue + i);
-						count_down++;
-					}
-					else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)) {
-						going_down[count_down] = *(order_queue + i);
-						count_down++;
-					}
-					else if (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN ||(order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						second_going_down[count_second_down] = *(order_queue + i);
-						count_second_down++;
+
+					if (atFloor){
+						//everything bigger, _including_ current floor
+						if ( (order_floor <= elevator_floor) && (order_type == HARDWARE_ORDER_DOWN || order_type == HARDWARE_ORDER_INSIDE) ){
+							going_down[count_down] = order_queue[i];
+							count_down++;
+						}
+						else if ( (order_type == HARDWARE_ORDER_UP) || ((order_floor > elevator_floor) && order_type == HARDWARE_ORDER_INSIDE) ){
+							going_up[count_up] = order_queue[i];
+							count_up++;
+						}
+						else if ( (order_floor > elevator_floor) && (order_type == HARDWARE_ORDER_DOWN) ){
+							second_going_down[count_second_down] = order_queue[i];
+							count_second_down++;
+						}
 					} else {
-						second_going_down[count_second_down] = *(order_queue + i);
-						count_second_down++;
+						//everything bigger, _not including_ current floor (because elevator is inbetween floors, and current floor isn't representative)
+						if ( (order_floor < elevator_floor) && (order_type == HARDWARE_ORDER_DOWN || order_type == HARDWARE_ORDER_INSIDE) ){
+							going_down[count_down] = order_queue[i];
+							count_down++;
+						}
+						else if ( (order_type == HARDWARE_ORDER_UP) || ((order_floor >= elevator_floor) && order_type == HARDWARE_ORDER_INSIDE) ){
+							going_up[count_up] = order_queue[i];
+							count_up++;
+						}
+						else if ( (order_floor >= elevator_floor) && (order_type == HARDWARE_ORDER_DOWN) ){
+							second_going_down[count_second_down] = order_queue[i];
+							count_second_down++;
+						}
 					}
+					// if ( (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) ){
+					// 	going_up[count_up] = *(order_queue + i);
+					// 	count_up++;
+					// }
+					// else if ((order_queue + i)->floor == elevator_floor && (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE){
+					// 	going_down[count_down] = *(order_queue + i);
+					// 	count_down++;
+					// }
+					// else if (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+					// 	going_down[count_down] = *(order_queue + i);
+					// 	count_down++;
+					// }
+					// else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)) {
+					// 	going_down[count_down] = *(order_queue + i);
+					// 	count_down++;
+					// }
+					// else if (((order_queue + i)->floor >= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN ||(order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+					// 	second_going_down[count_second_down] = *(order_queue + i);
+					// 	count_second_down++;
+					// } else {
+					// 	second_going_down[count_second_down] = *(order_queue + i);
+					// 	count_second_down++;
+					// }
 					break;
 				case HARDWARE_MOVEMENT_STOP:
 
 					printf("ERROR: logic error, movement stop should not happen here: will sort as if going down.");
 
-					if ( (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) || (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)) ){
-						going_up[count_up] = *(order_queue + i);
-						count_up++;
-					}
-					else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						going_down[count_down] = *(order_queue + i);
-						count_down++;
-					}
-					else if (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN ||(order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
-						second_going_down[count_second_down] = *(order_queue + i);
-						count_second_down++;
-					}
+					// if ( (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)) || (((order_queue + i)->floor < elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_UP)) ){
+					// 	going_up[count_up] = *(order_queue + i);
+					// 	count_up++;
+					// }
+					// else if (((order_queue + i)->floor <= elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN || (order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+					// 	going_down[count_down] = *(order_queue + i);
+					// 	count_down++;
+					// }
+					// else if (((order_queue + i)->floor > elevator_floor)&&((order_queue + i)->order_type == HARDWARE_ORDER_DOWN ||(order_queue + i)->order_type == HARDWARE_ORDER_INSIDE)){
+					// 	second_going_down[count_second_down] = *(order_queue + i);
+					// 	count_second_down++;
+					// }
 					break;
 			}
 		}
@@ -249,6 +336,6 @@ int order_queue_add_order(Order* order, int elevator_floor, HardwareMovement dir
 	order_queue[QUEUE_SIZE-1] = order_copy(*order);
 	order_queue_sortOrderQueue(elevator_floor, direction);
 	//need to delete added and sorted order. how?
-	order_queue[QUEUE_SIZE-1] = EMPTYORDER;
+	order_queue[QUEUE_SIZE-1] = order_delete(order_queue[QUEUE_SIZE-1]); //= EMPTYORDER;
 	return 0;
 }

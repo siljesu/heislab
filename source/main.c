@@ -118,9 +118,9 @@ void s_handleOrder(int floor, HardwareMovement moveDirection) {
 
     hardware_command_door_open(0);
     order_queue_deleteByShifting();
-    for (int i = 0; i < 2; i++) {
-        if (order_queue[0].floor == currentFloor) {
-            order_queue_deleteByShifting();
+    for (int i = 0; i < 12; i++) { //hardcoded queuesize
+        if (order_queue[i].floor == currentFloor) {
+            order_queue_deleteByShiftingAtIndex(i);
         }
     }
 

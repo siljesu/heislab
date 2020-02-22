@@ -7,11 +7,11 @@ void elevator_init() {
 
     int local_queue_size = 12;
     for (int i = 0; i < (local_queue_size); i++){
-        order_queue[i] = order_copy(EMPTYORDER);
-        going_up[i] = order_copy(EMPTYORDER);
-		going_down[i] = order_copy(EMPTYORDER);
-		second_going_up[i] = order_copy(EMPTYORDER);
-		second_going_down[i] = order_copy(EMPTYORDER);
+        order_queue[i] = EMPTYORDER;
+       	going_up[i] = EMPTYORDER;
+		going_down[i] = EMPTYORDER;
+		second_going_up[i] = EMPTYORDER;
+		second_going_down[i] = EMPTYORDER;
     }
 
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){
