@@ -12,7 +12,7 @@
  * @brief Table to hold up to 12 orders (12 is the max possible), sorted after proximity in the elevator's current path.
  */
 Order orderQueue[12];
-Order* p_firstOrder = &(orderQueue[0]);
+extern Order* p_firstOrder;
 
 Order goingUp[12];
 Order goingDown[12];
@@ -59,4 +59,3 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction);
  * @return 1 if true, 0 if false.
  */
 int orderQueue_addOrder(Order* order, int elevator_floor, HardwareMovement direction);
-

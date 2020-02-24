@@ -3,10 +3,11 @@
 #include "elevator.h"
 
 
-extern RelativePosition* p_relative_position = &relative_position;
+RelativePosition relative_position;
 
 
 void elevator_init() {
+    relative_position = ABOVE; //because elevator always starts driving down
     hardware_command_clear_all_order_lights();
 
     int local_queue_size = 12;
@@ -86,18 +87,18 @@ void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection)
 void elevator_setRelativePosition(HardwareMovement moveDirection){
     if (moveDirection == HARDWARE_MOVEMENT_UP) {
         if (relative_position == AT && (!elevator_amIAtAnyFloor())){
-            *p_relative_position = ABOVE;
+            relative_position = ABOVE;
         }
         else if (relative_position != AT && (elevator_amIAtAnyFloor())){
-            *p_relative_position = AT;
+            relative_position = AT;
         } 
     } 
     else if (moveDirection == HARDWARE_MOVEMENT_DOWN) {
         if (relative_position == AT && (!elevator_amIAtAnyFloor())){
-            *p_relative_position = BELOW;
+            relative_position = BELOW;
         }
         else if (relative_position != AT && (elevator_amIAtAnyFloor())){
-            *p_relative_position = AT;
+            relative_position = AT;
         } 
     }
 }

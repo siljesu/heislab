@@ -2,6 +2,7 @@
 #include "orderQueue.h"
 
 int QUEUE_SIZE = 12;
+Order* p_firstOrder = &(orderQueue[0]);
 
 void orderQueue_clear(){
 	for (int i = 0; i < QUEUE_SIZE ; i++){
@@ -240,7 +241,7 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 	orderQueue_sortChunksByDirection(countUp, countDown, countSecondUp, countSecondDown, direction);
 }
 
-int orderQueue_add_order(Order* order, int elevator_floor, HardwareMovement direction){
+int orderQueue_addOrder(Order* order, int elevator_floor, HardwareMovement direction){
 	orderQueue[QUEUE_SIZE-1] = order_copy(*order);
 	orderQueue_sortOrderQueue(elevator_floor, direction);
 	orderQueue[QUEUE_SIZE-1] = order_delete(orderQueue[QUEUE_SIZE-1]);

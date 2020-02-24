@@ -10,8 +10,8 @@
 
 
 typedef enum {BELOW, ABOVE, AT} RelativePosition; //1 for above current floor, 0 for below current floor
-static RelativePosition relative_position;
-static RelativePosition* p_relative_position;
+extern RelativePosition relative_position;
+//static RelativePosition* p_relative_position;
 
 /**
 * @brief state function pointer typedefed. 
