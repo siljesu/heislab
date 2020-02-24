@@ -2,22 +2,23 @@
 
 int orderTable[4][3];
 
-Order order_init(int floor, HardwareOrder order_type) {
+Order order_init(int floor, HardwareOrder orderType) {
+
     Order order;
     order.floor = floor;
-    order.order_type = order_type;
+    order.order_type = orderType;
     order.activeOrder = true;
-    hardware_command_order_light(floor,order_type,1);
+    hardware_command_order_light(floor,orderType,1);
     return order;
 }
 
-void order_turn_off_light(Order order) {
+void order_turnOffLight(Order order) {
     hardware_command_order_light(order.floor, order.order_type, 0);
 }
 
 Order order_delete(Order order) {
-    order_toggle_unique(order, 0);
-    order_turn_off_light(order);
+    order_toggleUnique(order, 0);
+    order_turnOffLight(order);
     return EMPTYORDER;
 }
 
@@ -26,7 +27,7 @@ Order order_copy(Order order) {
     return orderCopy;
 }
 
-void order_toggle_unique(Order order, int on) {
+void order_toggleUnique(Order order, int on) {
     if (on) {
         orderTable[order.floor][order.order_type] = 1; 
     } else {
@@ -34,7 +35,7 @@ void order_toggle_unique(Order order, int on) {
     }
 }
 
-int order_check_unique(Order order) {
+int order_checkUnique(Order order) {
     if (!orderTable[order.floor][order.order_type]) {
         return 1;
     } else {

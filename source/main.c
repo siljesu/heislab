@@ -30,8 +30,10 @@ static void sigint_handler(int sig){
 void s_idle(){
 
     hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    
     hardware_command_floor_indicator_on(FLOOR);
-    relative_position = AT;
+
+    elevator_setRelativePosition(currentMoveDirection);
 
     while(1){
         if (hardware_read_stop_signal()) {
@@ -72,12 +74,7 @@ void s_movingDown(){
         
         FLOOR = elevator_findCurrentFloor(FLOOR);
 
-        if (relative_position == AT && (!elevator_amIAtAnyFloor())){
-            relative_position = BELOW;
-        }
-        else if (relative_position != AT && (elevator_amIAtAnyFloor())){
-            relative_position = AT;
-        } 
+        elevator_setRelativePosition(currentMoveDirection); 
         
         //new target?
         int targetFloor = p_firstOrder->floor;
@@ -103,14 +100,10 @@ void s_movingUp(int FLOOR, HardwareMovement currentMoveDirection){
         
         elevator_checkAndAddOrder(FLOOR, currentMoveDirection);
 
+        
         FLOOR = elevator_findCurrentFloor(FLOOR);
 
-        if (relative_position == AT && (!elevator_amIAtAnyFloor())){
-            relative_position = ABOVE;
-        }
-        else if (relative_position != AT && (elevator_amIAtAnyFloor())){
-            relative_position = AT;
-        } 
+        elevator_setRelativePosition(currentMoveDirection);
 
         //new target?
         int targetFloor = p_firstOrder->floor;
@@ -277,7 +270,7 @@ void s_idleInBetweenFloors(){
                 p_state = &s_movingUp;
                 return;
             } else {
-                switch(relative_position){
+                switch(*p_relative_position){
                 case BELOW:
                     p_state = &s_movingUp;
                     break;
@@ -334,7 +327,6 @@ int main(){
 
     elevator_init();
 
-    //start at valid state?
     HardwareMovement initialMovement = HARDWARE_MOVEMENT_DOWN;
     hardware_command_movement(initialMovement);
 

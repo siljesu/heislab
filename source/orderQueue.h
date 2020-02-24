@@ -46,7 +46,7 @@ void orderQueue_sortIncrementally(Order* temp_array, bool increasing);
  /** 
  * @brief Receives "chunks" of sorted arrays, divided by direction. Sorts these in sequence, based on direction.
  */
-void orderQueue_sortChunksByDirection(int count_up,int count_down,int count_second_up,int count_second_down,HardwareMovement direction);
+void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondUp,int countSecondDown,HardwareMovement direction);
 
 /**
  * @brief Sorts entire order queue, based on direction

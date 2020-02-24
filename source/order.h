@@ -31,7 +31,7 @@ static const Order EMPTYORDER = {0,HARDWARE_ORDER_UP,false};
  *
  * @return 0 on success. Non-zero for failure.
  */
-Order order_init(int floor, HardwareOrder order_type);
+Order order_init(int floor, HardwareOrder orderType);
 
 /**
  * @brief Turns off corresponing light.

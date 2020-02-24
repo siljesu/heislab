@@ -8,6 +8,11 @@
 #define NUMBER_OF_FLOORS 4
 #define NUMBER_OF_ORDER_TYPES 3
 
+
+typedef enum {BELOW, ABOVE, AT} RelativePosition; //1 for above current floor, 0 for below current floor
+static RelativePosition relative_position;
+static RelativePosition* p_relative_position;
+
 /**
 * @brief state function pointer typedefed. 
 * 
@@ -52,7 +57,12 @@ int elevator_amIAtAnyFloor();
 **/
 int elevator_findCurrentFloor(int lastFloor);
 
-
+/**
+* @brief Sets new relative position when needed. Keeps track of where we are.
+*
+* @param moveDirection the elevators current move direction
+**/
+void elevator_setRelativePosition(HardwareMovement moveDirection);
 
 //--------------states------------------//
 
