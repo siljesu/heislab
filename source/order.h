@@ -11,20 +11,20 @@
 /**
  * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
  */
-int order_table[4][3];
+int orderTable[4][3];
 
 typedef struct{
 
     int floor;
     HardwareOrder order_type;
-    bool emptyOrder;
+    bool activeOrder;
 
 }Order;
 
 /**
  * @brief A standard empty order to initialize arrays.
  */
-static const Order EMPTYORDER = {0,HARDWARE_ORDER_UP,true};
+static const Order EMPTYORDER = {0,HARDWARE_ORDER_UP,false};
 
 
 /**
@@ -38,7 +38,7 @@ Order order_init(int floor, HardwareOrder order_type);
  * @brief Turns off corresponing light.
  *
  */
-void order_turn_off_light(Order order);
+void order_turnOffLight(Order order);
 
 /**
  * @brief Deletes order by deactivating and turning off order light.
@@ -59,11 +59,11 @@ Order order_copy(Order order);
  *
  * @return none
  */
-void order_toggle_unique(Order order, int on);
+void order_toggleUnique(Order order, int on);
 
 /**
  * @brief Checks if order already exists.
  *
  * @return returns 1 if unique, 0 if already exists.
  */
-int order_check_unique(Order order);
+int order_checkUnique(Order order);

@@ -7,7 +7,7 @@ void elevator_init() {
 
     int local_queue_size = 12;
     for (int i = 0; i < (local_queue_size); i++){
-        order_queue[i] = EMPTYORDER;
+        orderQueue[i] = EMPTYORDER;
        	going_up[i] = EMPTYORDER;
 		going_down[i] = EMPTYORDER;
 		second_going_up[i] = EMPTYORDER;
@@ -53,26 +53,26 @@ int elevator_amIAtAnyFloor(){
 void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection){
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){
         if (hardware_read_order(i, HARDWARE_ORDER_UP)){
-            Order order = {order_init(i,HARDWARE_ORDER_UP).floor, order_init(i,HARDWARE_ORDER_UP).order_type, order_init(i,HARDWARE_ORDER_UP).emptyOrder};
+            Order order = {order_init(i,HARDWARE_ORDER_UP).floor, order_init(i,HARDWARE_ORDER_UP).order_type, order_init(i,HARDWARE_ORDER_UP).activeOrder};
             if (order_check_unique(order)) {
                 Order *p_order = &order;
-                order_queue_add_order(p_order,currentFloor,moveDirection);
+                orderQueue_add_order(p_order,currentFloor,moveDirection);
                 order_toggle_unique(order,1);
             }
         }
         if (hardware_read_order(i, HARDWARE_ORDER_DOWN)){
-            Order order = {order_init(i,HARDWARE_ORDER_DOWN).floor, order_init(i,HARDWARE_ORDER_DOWN).order_type, order_init(i,HARDWARE_ORDER_DOWN).emptyOrder};
+            Order order = {order_init(i,HARDWARE_ORDER_DOWN).floor, order_init(i,HARDWARE_ORDER_DOWN).order_type, order_init(i,HARDWARE_ORDER_DOWN).activeOrder};
             if (order_check_unique(order)) {
                 Order *p_order = &order;
-                order_queue_add_order(p_order,currentFloor,moveDirection);
+                orderQueue_add_order(p_order,currentFloor,moveDirection);
                 order_toggle_unique(order,1);
             }
         }
         if (hardware_read_order(i, HARDWARE_ORDER_INSIDE)){
-            Order order = {order_init(i,HARDWARE_ORDER_INSIDE).floor, order_init(i,HARDWARE_ORDER_INSIDE).order_type, order_init(i,HARDWARE_ORDER_INSIDE).emptyOrder};
+            Order order = {order_init(i,HARDWARE_ORDER_INSIDE).floor, order_init(i,HARDWARE_ORDER_INSIDE).order_type, order_init(i,HARDWARE_ORDER_INSIDE).activeOrder};
             if (order_check_unique(order)) {
                 Order *p_order = &order;
-                order_queue_add_order(p_order,currentFloor,moveDirection);
+                orderQueue_add_order(p_order,currentFloor,moveDirection);
                 order_toggle_unique(order,1);
             }
         }

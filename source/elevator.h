@@ -3,7 +3,7 @@
 * @brief elevator operations and states are in this file.
 **/
 
-#include "order_queue.h"
+#include "orderQueue.h"
 
 #define NUMBER_OF_FLOORS 4
 #define NUMBER_OF_ORDER_TYPES 3
@@ -21,16 +21,16 @@ typedef void (*state)(int,HardwareMovement);
 void elevator_init();
 
 /**
-* @brief Checks if someone places any valid order at any place. Will initialize this order and adds it to order_queue.
+* @brief Checks if someone places any valid order at any place. Will initialize this order and adds it to orderQueue.
 *
 * @param
 **/
 void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection);
 
 /**
-* @brief Checks if target destination (first element of order_queue) is reached.
+* @brief Checks if target destination (first element of orderQueue) is reached.
 *
-* @param targetFloor Floor of first element in order_queue
+* @param targetFloor Floor of first element in orderQueue
 *
 * @return 1 if true, 0 if not reached yet.
 **/
