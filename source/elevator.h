@@ -36,6 +36,8 @@ void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection)
 **/
 int elevator_amIAtFloor(int targetFloor);
 
+int elevator_amIAtAnyFloor();
+
 /**
 * @brief Checks if new floor is reached.
 *

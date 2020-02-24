@@ -5,6 +5,10 @@
 #include "elevator.h"
 #include "states.h"
 
+typedef enum {BELOW, ABOVE, AT} RelativePosition; //1 for above current floor, 0 for below current floor
+static RelativePosition relative_position;
+static RelativePosition* p_relative_position = &relative_position;
+
 static void sigint_handler(int sig){
     (void)(sig);
     printf("Terminating elevator\n");
@@ -18,6 +22,7 @@ void s_idle(int floor, HardwareMovement moveDirection){
     hardware_command_movement(HARDWARE_MOVEMENT_STOP);
     hardware_command_floor_indicator_on(currentFloor);
     HardwareMovement currentMoveDirection = moveDirection;
+    *p_relative_position = AT;
 
     while(1){
         if (hardware_read_stop_signal()) {
@@ -56,6 +61,13 @@ void s_movingDown(int floor, HardwareMovement moveDirection){
         elevator_checkAndAddOrder(currentFloor, currentMoveDirection);
         
         currentFloor = elevator_findCurrentFloor(currentFloor);
+
+        if (relative_position == AT && (!elevator_amIAtAnyFloor())){
+            *p_relative_position = BELOW;
+        }
+        else if (relative_position != AT && (elevator_amIAtAnyFloor())){
+            *p_relative_position = AT;
+        } 
         
         //new target?
         targetFloor = order_queue[0].floor;
@@ -82,6 +94,13 @@ void s_movingUp(int floor, HardwareMovement moveDirection){
         elevator_checkAndAddOrder(currentFloor, moveDirection);
 
         currentFloor = elevator_findCurrentFloor(currentFloor);
+
+        if (relative_position == AT && (!elevator_amIAtAnyFloor())){
+            *p_relative_position = ABOVE;
+        }
+        else if (relative_position != AT && (elevator_amIAtAnyFloor())){
+            *p_relative_position = AT;
+        } 
 
         //new target?
         targetFloor = order_queue[0].floor;
@@ -236,17 +255,23 @@ void s_idleInBetweenFloors(int floor, HardwareMovement moveDirection){
 
             Order firstOrder = {order_queue[0].floor, order_queue[0].order_type, order_queue[0].emptyOrder};
 
+            
+
             if(firstOrder.floor < lastFloor){
                 s_movingDown(lastFloor, HARDWARE_MOVEMENT_DOWN);
             } else if (firstOrder.floor > lastFloor){
                 s_movingUp(lastFloor, HARDWARE_MOVEMENT_UP);
             } else {
-                //order in *your* floor, are you above or below?
-                if (lastMoveDirection == HARDWARE_MOVEMENT_UP) {
-                    s_movingDown(lastFloor, HARDWARE_MOVEMENT_DOWN);
-                }
-                else if (lastMoveDirection == HARDWARE_MOVEMENT_DOWN) {
+                switch(relative_position){
+                case BELOW:
                     s_movingUp(lastFloor, HARDWARE_MOVEMENT_UP);
+                    break;
+                case ABOVE:
+                    s_movingDown(lastFloor, HARDWARE_MOVEMENT_DOWN);
+                    break;
+                case AT:
+                    s_idle(firstOrder.floor, HARDWARE_MOVEMENT_DOWN); //Filler values; states must be rewritten anyways
+                    break;
                 }
             }
         }

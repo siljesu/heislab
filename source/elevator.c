@@ -40,6 +40,15 @@ int elevator_amIAtFloor(int targetFloor){
     return 0;
 }
 
+int elevator_amIAtAnyFloor(){
+    for (int i = 0; i < NUMBER_OF_FLOORS; i++){
+       if(hardware_read_floor_sensor(i)){
+            return 1;      
+        }
+    }
+    return 0;
+}
+
 
 void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection){
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){
