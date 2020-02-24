@@ -5,18 +5,39 @@
  */
 
 #include <stdbool.h> //Exists in order.h. Remove once merged properly
-#include "order.h"
+#include "order_test.h"
+
+/**
+ * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
+ */
+bool order_table[12];
+
+Order testOrder;
+Order* p_testOrder = &testOrder;
+Order testOrder2;
+Order* p_testOrder2 = &testOrder2;
+Order testOrder3;
+Order* p_testOrder3 = &testOrder3;
+Order testOrder4;
+Order* p_testOrder4 = &testOrder4;
+Order testOrder5;
+Order* p_testOrder5 = &testOrder5;
+
+
+Order emptyOrder = {0,HARDWARE_MOVEMENT_UP,true};
+
+Order going_up[12]; //Set to QUEUE_SIZE for redundancy, rather than limitation
+Order going_down[12];
+Order second_going_up[12]; // happens only if already going up
+Order second_going_down[12]; // happens only if already going down
+
+
 
 
 /**
  * @brief Table to hold up to 12 orders (12 is the max possible), sorted after proximity in the elevator's current path.
  */
 Order order_queue[12];
-
-Order going_up[12];
-Order going_down[12];
-Order second_going_up[12]; // happens only if already going up
-Order second_going_down[12]; // happens only if already going down
 
 /**
  * @brief Clears whole queue.
@@ -35,12 +56,7 @@ int order_queue_empty();
 /**
  * @brief shifts every element in the order queue one place towards left
  */
-void order_queue_deleteByShifting();
-
-/**
- * @brief shifts every element in the order queue one place towards left, from the index given
- */
-void order_queue_deleteByShiftingAtIndex(int i);
+void order_queue_shift();
 
 /**
  * @brief Sorts queue, must be used when adding order.
@@ -63,4 +79,3 @@ void order_queue_sortOrderQueue(int elevator_floor, HardwareMovement direction);
  * @return 1 if true, 0 if false.
  */
 int order_queue_add_order(Order* order, int elevator_floor, HardwareMovement direction);
-
