@@ -7,11 +7,10 @@
 #include "hardware.h"
 #include <stdbool.h>
 
-
+extern int orderTable[4][3];
 /**
  * @brief Lookup table that shows "true" (1) for each order that's placed. Orders correspond with hardware.c, lines 127 - 132
  */
-int orderTable[4][3];
 
 typedef struct{
 

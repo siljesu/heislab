@@ -8,15 +8,15 @@ void elevator_init() {
     int local_queue_size = 12;
     for (int i = 0; i < (local_queue_size); i++){
         orderQueue[i] = EMPTYORDER;
-       	going_up[i] = EMPTYORDER;
-		going_down[i] = EMPTYORDER;
-		second_going_up[i] = EMPTYORDER;
-		second_going_down[i] = EMPTYORDER;
+       	goingUp[i] = EMPTYORDER;
+		goingDown[i] = EMPTYORDER;
+		secondGoingUp[i] = EMPTYORDER;
+		secondGoingDown[i] = EMPTYORDER;
     }
 
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){
         for (int j = 0; j < NUMBER_OF_ORDER_TYPES; j++){
-            order_table[i][j] = 0;
+            orderTable[i][j] = 0;
         }
     }
 }

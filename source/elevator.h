@@ -12,7 +12,7 @@
 * @brief state function pointer typedefed. 
 * 
 **/
-typedef void (*state)(int,HardwareMovement);
+typedef void (*state)();
 
 /**
 * @brief Initializes arrays and resets lights.
@@ -36,6 +36,11 @@ void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection)
 **/
 int elevator_amIAtFloor(int targetFloor);
 
+/**
+* @brief Checks whether the elevator is at a floor or inbetween floors. Note: this function does not check which floor the elevator might be at.
+*
+* @return 0 if between floors, 1 if at a floor. Note that it coule be at any of the available floors if 1 is returned!
+**/
 int elevator_amIAtAnyFloor();
 
 /**

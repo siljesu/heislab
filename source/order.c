@@ -1,5 +1,7 @@
 #include "order.h"
 
+int orderTable[4][3];
+
 Order order_init(int floor, HardwareOrder order_type) {
     Order order;
     order.floor = floor;
@@ -26,14 +28,14 @@ Order order_copy(Order order) {
 
 void order_toggle_unique(Order order, int on) {
     if (on) {
-        order_table[order.floor][order.order_type] = 1; 
+        orderTable[order.floor][order.order_type] = 1; 
     } else {
-        order_table[order.floor][order.order_type] = 0; 
+        orderTable[order.floor][order.order_type] = 0; 
     }
 }
 
 int order_check_unique(Order order) {
-    if (!order_table[order.floor][order.order_type]) {
+    if (!orderTable[order.floor][order.order_type]) {
         return 1;
     } else {
         return 0;

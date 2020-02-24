@@ -12,6 +12,7 @@
  * @brief Table to hold up to 12 orders (12 is the max possible), sorted after proximity in the elevator's current path.
  */
 Order orderQueue[12];
+Order* p_firstOrder = &(orderQueue[0]);
 
 Order goingUp[12];
 Order goingDown[12];
