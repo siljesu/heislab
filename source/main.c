@@ -5,10 +5,6 @@
 #include "elevator.h"
 #include "states.h"
 
-typedef enum {BELOW, ABOVE, AT} RelativePosition; //1 for above current floor, 0 for below current floor
-static RelativePosition relative_position;
-static RelativePosition* p_relative_position = &relative_position;
-
 static void sigint_handler(int sig){
     (void)(sig);
     printf("Terminating elevator\n");
@@ -20,7 +16,7 @@ void s_idle(int currentFloor, HardwareMovement currentMoveDirection){
 
     hardware_command_movement(HARDWARE_MOVEMENT_STOP);
     hardware_command_floor_indicator_on(currentFloor);
-    *p_relative_position = AT;
+    elevator_setRelativePosition(currentMoveDirection);
 
     while(1){
         if (hardware_read_stop_signal()) {
@@ -58,12 +54,7 @@ void s_movingDown(int currentFloor, HardwareMovement currentMoveDirection){
         
         currentFloor = elevator_findCurrentFloor(currentFloor);
 
-        if (relative_position == AT && (!elevator_amIAtAnyFloor())){
-            *p_relative_position = BELOW;
-        }
-        else if (relative_position != AT && (elevator_amIAtAnyFloor())){
-            *p_relative_position = AT;
-        } 
+        elevator_setRelativePosition(currentMoveDirection); 
         
         //new target?
         targetFloor = orderQueue[0].floor;
@@ -87,14 +78,10 @@ void s_movingUp(int currentFloor, HardwareMovement currentMoveDirection){
         
         elevator_checkAndAddOrder(currentFloor, currentMoveDirection);
 
+        
         currentFloor = elevator_findCurrentFloor(currentFloor);
 
-        if (relative_position == AT && (!elevator_amIAtAnyFloor())){
-            *p_relative_position = ABOVE;
-        }
-        else if (relative_position != AT && (elevator_amIAtAnyFloor())){
-            *p_relative_position = AT;
-        } 
+        elevator_setRelativePosition(currentMoveDirection);
 
         //new target?
         targetFloor = orderQueue[0].floor;
@@ -240,7 +227,7 @@ void s_idleInBetweenFloors(int lastFloor, HardwareMovement lastMoveDirection){
 
         if (!orderQueue_empty()) {
 
-            Order firstOrder = {orderQueue[0].floor, orderQueue[0].order_type, orderQueue[0].activeOrder};
+            Order firstOrder = {orderQueue[0].floor, orderQueue[0].orderType, orderQueue[0].activeOrder};
 
             
 
@@ -249,7 +236,7 @@ void s_idleInBetweenFloors(int lastFloor, HardwareMovement lastMoveDirection){
             } else if (firstOrder.floor > lastFloor){
                 s_movingUp(lastFloor, HARDWARE_MOVEMENT_UP);
             } else {
-                switch(relative_position){
+                switch(*p_relative_position){
                 case BELOW:
                     s_movingUp(lastFloor, HARDWARE_MOVEMENT_UP);
                     break;
@@ -278,7 +265,6 @@ int main(){
 
     elevator_init();
 
-    //start at valid state?
     HardwareMovement initialMovement = HARDWARE_MOVEMENT_DOWN;
     hardware_command_movement(initialMovement);
 
