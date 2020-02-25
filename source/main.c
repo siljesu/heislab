@@ -4,19 +4,14 @@
 #include <signal.h>
 #include "elevator.h"
 
-//static RelativePosition relative_position;
-//static RelativePosition* p_relative_position = &relative_position;
+#define DOORS_OPEN_TIME 3000 //in mlliseconds
+
 
 state p_state;
-/*typedef enum {IDLE, MOVING_DOWN, MOVING_UP, HANDLE_ORDER, EMERGENCY_STOP, IDLE_BETWEEN_g_FLOORS, OBSTRUCTION} State;
-static State currentState;
-State* p_currentState = &currentState;*/
 
 int g_FLOOR;
-    //int* p_floor = &floor;
+
 HardwareMovement currentMoveDirection;
-    //HardwareMovement currentMoveDirection;
-    //HardwareMovement* p_currentMoveDirection = &currentMoveDirection;
 
 static void sigint_handler(int sig){
     (void)(sig);
@@ -31,13 +26,11 @@ void s_movingUp();
 void s_handleOrder();
 void s_emergencyStop();
 void s_idleBetweenFloors();
-void s_obstruction();
+void s_doorsOpen();
 
 void s_idle(){
 
     hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-    
-    //hardware_command_floor_indicator_on(g_FLOOR);
 
     elevator_setRelativePosition(currentMoveDirection);
 
@@ -120,16 +113,24 @@ void s_movingUp(){
     }
 }
 
+//int doorsAlreadyOpened = 0; //If obstruction ever occurs, the doors will be considered already opened (1)
 
-void s_handleOrder() {     
+void s_doorsOpen(){
 
-    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-    //hardware_command_floor_indicator_on(g_FLOOR);
+    while(hardware_read_obstruction_signal()){
+  //      doorsAlreadyOpened = 1;
 
-    int threeSeconds = 3000;
-    time_t startTime = clock() * 1000 / CLOCKS_PER_SEC;
+        hardware_command_door_open(1);
+        elevator_checkAndAddOrder(g_FLOOR,currentMoveDirection);
+        if (hardware_read_stop_signal()) {
+            p_state = &s_emergencyStop;
+            return;
+        }
+    }
 
-    while (startTime + threeSeconds >= clock()* 1000 / CLOCKS_PER_SEC) {
+    time_t startTime = clock() * 1000/ CLOCKS_PER_SEC;
+
+    while (startTime + DOORS_OPEN_TIME >= clock() * 1000/ CLOCKS_PER_SEC) {
         hardware_command_door_open(1);
         
         //need to check for things
@@ -139,12 +140,26 @@ void s_handleOrder() {
             return;
         }
         if (hardware_read_obstruction_signal()) {
-            p_state = &s_obstruction;
+            p_state = &s_doorsOpen;
             p_state();
         }
     }
 
-    hardware_command_door_open(0);
+    hardware_command_door_open(0); //closing doors when exiting state
+    return; //writing superfluous return for consistency
+}
+
+void s_handleOrder() {     
+
+    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    //hardware_command_floor_indicator_on(g_FLOOR);
+
+    //if (!doorsAlreadyOpened){
+        p_state = &s_doorsOpen;
+        p_state();
+      //  doorsAlreadyOpened = 0;
+    //}
+    
     for (int i = 11; i > -1; i--) { //hardcoded queuesize
         if (orderQueue[i].floor == g_FLOOR) {
             orderQueue_deleteByShiftingAtIndex(i);
@@ -152,7 +167,7 @@ void s_handleOrder() {
     }
 
     p_state = &s_idle;
-
+    return;
 }
 
 
@@ -180,26 +195,10 @@ void s_emergencyStop(){
     
     //exit actions
     if (elevator_amIAtFloor(g_FLOOR)) {
-        //create 3 sec timer. remember to check for obstruction.
-        int threeSeconds = 3000;
-        time_t startTime = clock() * 1000/ CLOCKS_PER_SEC;
+        //doorsAlreadyOpened = 1;
+        p_state = &s_doorsOpen;
+        p_state();
 
-        while (startTime + threeSeconds >= clock() * 1000/ CLOCKS_PER_SEC) {
-            hardware_command_door_open(1);
-            
-            //need to check for things
-            elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
-            if (hardware_read_stop_signal()) {
-                p_state = &s_emergencyStop;
-                return;
-            }
-            if (hardware_read_obstruction_signal()) {
-                p_state = &s_obstruction;
-                p_state();
-            }
-        }
-
-        hardware_command_door_open(0);
         p_state = &s_idle;
         return;
 
@@ -209,7 +208,7 @@ void s_emergencyStop(){
         return;
     }
 }
-
+/*
 void s_obstruction(){
 
     hardware_command_movement(HARDWARE_MOVEMENT_STOP);
@@ -248,7 +247,7 @@ void s_obstruction(){
     hardware_command_door_open(0);
     return;
 }
-
+*/
 
 void s_idleBetweenFloors(){
 
@@ -289,6 +288,7 @@ void s_idleBetweenFloors(){
         }
     }
 }
+
 
 int main(){
     int error = hardware_init();
