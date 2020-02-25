@@ -4,10 +4,7 @@
 #include <signal.h>
 #include "elevator.h"
 
-#define DOORS_OPEN_TIME 3000 //in mlliseconds
-
-
-state p_state;
+#define DOORS_OPEN_TIME 3000
 
 int g_FLOOR;
 
@@ -21,329 +18,168 @@ static void sigint_handler(int sig){
 }
 
 void s_idle();
-void s_movingDown();
-void s_movingUp();
+void s_move();
 void s_handleOrder();
 void s_emergencyStop();
-void s_idleBetweenFloors();
-void s_doorsOpen();
+void s_doorsOpenTimer();
 
 void s_idle(){
 
-    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    elevator_setRelativePosition(currentMoveDirection);
+    elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
+
+    if (hardware_read_stop_signal() && elevator_amIAtAnyFloor()) {
+        elevator_stopMotor();
+        elevator_openDoors();
+        return EMERGENCY_STOP;
+    }
+    if (hardware_read_stop_signal() && !elevator_amIAtAnyFloor()) {
+        elevator_stopMotor();
+        return EMERGENCY_STOP; 
+    }
+    if (p_firstOrder->floor < g_FLOOR && p_firstOrder->activeOrder) {
+        elevator_goDown();
+        return MOVE; 
+    }
+    if (p_firstOrder->floor > g_FLOOR && p_firstOrder->activeOrder) {
+        elevator_goUp();
+        return MOVE; 
+    }
+    if (p_firstOrder->floor == g_FLOOR && p_firstOrder->activeOrder) {
+        switch(relativePosition) {
+            case BELOW:
+                elevator_goUp();
+                return MOVE;
+                break;
+            case ABOVE:
+                elevator_goDown();
+                return MOVE;
+                break;
+            case AT:
+                elevator_stopMotor();
+                return HANDLE_ORDER;
+                break;
+        }
+    }
+
+
+void s_move(){
 
     elevator_setRelativePosition(currentMoveDirection);
+    elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
 
-    while(1){
-        if (hardware_read_stop_signal()) {
-            p_state = &s_emergencyStop;
-            return; //We don't need to break and go out of scope - return does this for us
-        }
+    g_FLOOR = elevator_findCurrentFloor(g_FLOOR); // here floor inicator is set, bad decision?
 
-        elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
-
-        if (!orderQueue_empty()) {
-
-            if(p_firstOrder->floor < g_FLOOR){
-                p_state = &s_movingDown;
-                return;
-            } else if (p_firstOrder->floor > g_FLOOR){
-                p_state = &s_movingUp;
-                return;
-            } else if (p_firstOrder->floor == g_FLOOR){ //"enter elevator"
-                p_state = &s_handleOrder;
-                return;
-            }
-        }
+    if (hardware_read_stop_signal() && elevator_amIAtAnyFloor()) {
+        elevator_stopMotor();
+        elevator_openDoors();
+        return EMERGENCY_STOP; 
     }
-}
-
-void s_movingDown(){
-
-    hardware_command_movement(HARDWARE_MOVEMENT_DOWN);
-    currentMoveDirection = HARDWARE_MOVEMENT_DOWN;
-    
-    while(1){
-        if (hardware_read_stop_signal()) {
-            p_state = &s_emergencyStop;
-            return;
-        }
-
-        elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
-
-        elevator_setRelativePosition(currentMoveDirection); 
-        
-        //new target?
-        int targetFloor = p_firstOrder->floor;
-        g_FLOOR = elevator_findCurrentFloor(g_FLOOR);
-
-        if (elevator_amIAtFloor(targetFloor)) {
-            g_FLOOR = elevator_findCurrentFloor(g_FLOOR);
-            p_state = &s_handleOrder;
-            return;
-        }
+    if (hardware_read_stop_signal() && !elevator_amIAtAnyFloor()) {
+        elevator_stopMotor();
+        return EMERGENCY_STOP; 
+    }
+    if (elevator_amIAtFloor(p_firstOrder->floor)) {
+        elevator_stopMotor();
+        return HANDLE_ORDER;
     }
 }
 
 
-void s_movingUp(){
-
-    hardware_command_movement(HARDWARE_MOVEMENT_UP);
-    currentMoveDirection = HARDWARE_MOVEMENT_UP;
-    
-    while(1){
-        if (hardware_read_stop_signal()) {
-            p_state = &s_emergencyStop;
-            return;
-        }
-        
-        elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
-
-        elevator_setRelativePosition(currentMoveDirection);
-
-        //new target?
-        int targetFloor = p_firstOrder->floor;
-        g_FLOOR = elevator_findCurrentFloor(g_FLOOR); //important to update in time
-
-        if (elevator_amIAtFloor(targetFloor)) {
-            g_FLOOR = elevator_findCurrentFloor(g_FLOOR);
-            p_state = &s_handleOrder;
-            return;
-        }
-    }
-}
-
-//int doorsAlreadyOpened = 0; //If obstruction ever occurs, the doors will be considered already opened (1)
-
-void s_doorsOpen(){
-
-    while(hardware_read_obstruction_signal()){
-  //      doorsAlreadyOpened = 1;
-
-        hardware_command_door_open(1);
-        elevator_checkAndAddOrder(g_FLOOR,currentMoveDirection);
-        if (hardware_read_stop_signal()) {
-            p_state = &s_emergencyStop;
-            return;
-        }
-    }
+void s_doorsOpenTimer(){ //OPEN DOORS OUTSIDE OF OPEN DOORS? (IN TRANSITION)
 
     time_t startTime = clock() * 1000/ CLOCKS_PER_SEC;
 
     while (startTime + DOORS_OPEN_TIME >= clock() * 1000/ CLOCKS_PER_SEC) {
-        hardware_command_door_open(1);
-        
-        //need to check for things
-        elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
-        if (hardware_read_stop_signal()) {
-            p_state = &s_emergencyStop;
-            return;
+
+        elevator_checkAndAddOrder(g_FLOOR,currentMoveDirection);
+
+        if (hardware_read_stop_signal() && elevator_amIAtAnyFloor()) {
+            elevator_stopMotor();
+            elevator_openDoors();
+            return EMERGENCY_STOP;
         }
-        if (hardware_read_obstruction_signal()) {
-            p_state = &s_doorsOpen;
-            p_state();
+        if (hardware_read_obstruction_signal()) { //unefficient to start timer every time?
+            return DOORS_OPEN_TIMER;
         }
     }
-
-    hardware_command_door_open(0); //closing doors when exiting state
-    return; //writing superfluous return for consistency
+    elevator_closeDoors();
+    return IDLE;
 }
+
 
 void s_handleOrder() {     
 
-    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-    //hardware_command_floor_indicator_on(g_FLOOR);
+    elevator_handleOrder();
 
-    //if (!doorsAlreadyOpened){
-        p_state = &s_doorsOpen;
-        p_state();
-      //  doorsAlreadyOpened = 0;
-    //}
-    
-    for (int i = 11; i > -1; i--) { //hardcoded queuesize
-        if (orderQueue[i].floor == g_FLOOR) {
-            orderQueue_deleteByShiftingAtIndex(i);
-        }
-    }
-
-    p_state = &s_idle;
-    return;
+    elevator_openDoors();
+    return DOORS_OPEN_TIMER;
+    //------------------------ PROBLEM: vil slukke lys og slette order etter timer, ikke før. -----------------------------------------------------
+    //------------------------ Trenger handle order deale med emergency signal osv? --------------------------------------------------------------
 }
 
 
 void s_emergencyStop(){
 
-    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-    
     orderQueue_clear();
+    hardware_command_stop_light(1);
 
-    while(hardware_read_stop_signal()){
-        
-        hardware_command_stop_light(1);
-        
-        if (elevator_amIAtFloor(g_FLOOR)) {
-            //then you are on a floor, and must open doors.
-            hardware_command_door_open(1);
-            
-        } else {
-            //then you are in the middle of floors, with g_FLOOR as the last floor you were at, going in movementDirection. Must close doors.
-            hardware_command_door_open(0);
-        }
+    if (!hardware_read_stop_signal() && elevator_amIAtAnyFloor()) {
+        elevator_openDoors();
+        hardware_command_stop_light(0);
+        return DOORS_OPEN_TIMER;
     }
-
-    hardware_command_stop_light(0);
-    
-    //exit actions
-    if (elevator_amIAtFloor(g_FLOOR)) {
-        //doorsAlreadyOpened = 1;
-        p_state = &s_doorsOpen;
-        p_state();
-
-        p_state = &s_idle;
-        return;
-
-    } else {
-        //ready, in the middle of floors; dont need to worry about doors.
-        p_state = &s_idleBetweenFloors;
-        return;
+    if (!hardware_read_stop_signal() && !elevator_amIAtAnyFloor()) {
+        hardware_command_stop_light(0);
+        return IDLE; 
     }
 }
-/*
-void s_obstruction(){
 
-    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
-    
-    while(hardware_read_obstruction_signal()){
-        hardware_command_door_open(1);
-        elevator_checkAndAddOrder(g_FLOOR,currentMoveDirection);
-        if (hardware_read_stop_signal()) {
-            p_state = &s_emergencyStop;
-            return;
-        }
 
-    }
-    
-    //exit actions
-    //create 3 sec timer. remember to check for obstruction.
-    int threeSeconds = 3000;
-    time_t startTime = clock() * 1000/ CLOCKS_PER_SEC;
 
-    while (startTime + threeSeconds >= clock() * 1000/ CLOCKS_PER_SEC) {
-        hardware_command_door_open(1);
+//-------------------------------------
 
-        //need to check for things
-        elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
+int main(){
 
-        if (hardware_read_stop_signal()) {
-            p_state = &s_emergencyStop;
-            return;
-        }
-        if (hardware_read_obstruction_signal()) {
-            p_state = &s_obstruction;
-            p_state();
-        }
+    int error = hardware_init();
+
+    if(error != 0){
+        fprintf(stderr, "Unable to initialize hardware\n");
+        exit(1);
     }
 
-    hardware_command_door_open(0);
-    return;
-}
-*/
+    signal(SIGINT, sigint_handler);
 
-void s_idleBetweenFloors(){
+    elevator_init();
+
+    State state = IDLE;
+    StateFunction p_state = s_idle;
+
+    while(!elevator_amIAtAnyFloor()) {
+        //Waiting 'till a floor is reached
+    }
 
     while(1) {
-        elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
-
-        if (hardware_read_stop_signal()) {
-            p_state = &s_emergencyStop;
-            return;
-        }
-
-        if (!orderQueue_empty()) {
-
-            Order firstOrder = {p_firstOrder->floor, p_firstOrder->order_type, p_firstOrder->activeOrder};
-
-            
-
-            if(firstOrder.floor < g_FLOOR){
-                p_state = &s_movingDown;
-                return;
-            } else if (firstOrder.floor > g_FLOOR){
-                p_state = &s_movingUp;
-                return;
-            } else {
-                switch(relative_position){
-                case BELOW:
-                    p_state = &s_movingUp;
-                    break;
-                case ABOVE:
-                    p_state = &s_movingDown;
-                    break;
-                case AT:
-                    p_state = &s_idle; //Filler values; states must be rewritten anyways
-                    break;
-                }
-                return;
-            }
+        State nextState = p_state();
+        switch(nextState){
+            case IDLE:
+                p_state = s_idle;
+                break;
+            case MOVING_DOWN:
+                p_state = s_movingDown;
+                break;
+            case MOVING_UP:
+                p_state = s_movingUp;
+                break;
+            case DOORS_OPEN:
+                p_state = s_doorsOpen;
+                break;
+            case EMERGENCY_STOP:
+                p_state = s_emergencyStop;
+                break;
+            case HANDLE_ORDER:
+                p_state = s_handleOrder;
+                break;
         }
     }
 }
-
-
-int main(){
-    int error = hardware_init();
-    if(error != 0){
-        fprintf(stderr, "Unable to initialize hardware\n");
-        exit(1);
-    }
-
-    signal(SIGINT, sigint_handler);
-
-    elevator_init();
-
-    //start at valid state?
-    currentMoveDirection = HARDWARE_MOVEMENT_DOWN;
-    hardware_command_movement(currentMoveDirection);
-    int undefinedState = 1;
-
-    while(undefinedState){
-        for (int i = 0; i < NUMBER_OF_FLOORS; i++){
-            if (hardware_read_floor_sensor(i)){
-                g_FLOOR = i;
-                p_state = &s_idle;
-                undefinedState = 0;
-            }
-        }
-    } 
-
-    while(1){
-        p_state();       
-    }
-
-    return 0;
-}
-/*
-int main(){
-    int error = hardware_init();
-    if(error != 0){
-        fprintf(stderr, "Unable to initialize hardware\n");
-        exit(1);
-    }
-
-    signal(SIGINT, sigint_handler);
-
-    elevator_init();
-
-    HardwareMovement initialMovement = HARDWARE_MOVEMENT_DOWN;
-    hardware_command_movement(initialMovement);
-
-    while(1){
-        for (int i = 0; i < NUMBER_OF_FLOORS; i++){
-            if (hardware_read_floor_sensor(i)){
-                s_idle(i,initialMovement);
-            }
-        }        
-    }
-
-    return 0;
-}*/

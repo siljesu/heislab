@@ -12,12 +12,13 @@
 typedef enum {BELOW, ABOVE, AT} RelativePosition; //1 for above current floor, 0 for below current floor
 extern RelativePosition relative_position;
 //static RelativePosition* p_relative_position;
+typedef enum {IDLE, MOVE, HANDLE_ORDER, DOORS_OPEN_TIMER, EMERGENCY_STOP} State;
 
 /**
 * @brief state function pointer typedefed. 
 * 
 **/
-typedef void (*state)();
+typedef State (*StateFunction)();
 
 /**
 * @brief Initializes arrays and resets lights.
@@ -64,65 +65,14 @@ int elevator_findCurrentFloor(int lastFloor);
 **/
 void elevator_setRelativePosition(HardwareMovement moveDirection);
 
-//--------------states------------------//
+void elevator_stopMotor();
 
-// /**
-// * @brief State: idle. Will stay idle at a defined floor until stop button is pressed or new order arrives, either up or down or to enter elevator. 
-// *
-// * @param
-// *
-// * @return void function
-// **/
-// void s_idle(int floor, HardwareMovement moveDirection);
+void elevator_goDown();
 
-// /**
-// * @brief State: moving up. Will initialize hardware movement until target floor reached (if new order arrives which gets higher priority, target floor can change).
-// *
-// * @param
-// **/
-// void s_movingUp(int floor, HardwareMovement moveDirection);
+void elevator_goUp();
 
-// /**
-// * @brief State: moving down. Will initialize hardware movement until target floor reached (if new order arrives which gets higher priority, target floor can change).
-// *
-// * @param
-// *
-// * @return void function
-// **/
-// void s_movingDown(int floor, HardwareMovement moveDirection);
+void elevator_openDoors();
 
-// /**
-// * @brief State: handle order. stops and opens door for three seconds. goes into idle state when finished.
-// *
-// * @param
-// *
-// * @return void function
-// **/
-// void s_handleOrder(int floor, HardwareMovement moveDirection);
+void elevator_closeDoors();
 
-// /**
-// * @brief State: emergency stop. Will immidiately stop motors, and clear order queue. If at a floor, will open doors. Goes into idle or idleBetweenFloors.
-// *
-// * @param
-// *
-// * @return void function
-// **/
-// void s_emergencyStop(int floor, HardwareMovement moveDirection);
-
-// /**
-// * @brief State: obstruction. Something is blocking the door, will keep doors open until this is okay.
-// *
-// * @param
-// *
-// * @return void function
-// **/
-// void s_obstruction(int floor, HardwareMovement moveDirection);
-
-// /**
-// * @brief State: idle between floors. Behaves like idle, only in between floors.
-// *
-// * @param
-// *
-// * @return void function
-// **/
-// void s_idleInBetweenFloors(int floor, HardwareMovement moveDirection);
+void elevator_handleOrder();

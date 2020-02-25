@@ -24,6 +24,9 @@ void elevator_init() {
             orderTable[i][j] = 0;
         }
     }
+
+    currentMoveDirection = HARDWARE_MOVEMENT_DOWN;
+    hardware_command_movement(currentMoveDirection);
 }
 
 int elevator_findCurrentFloor(int lastFloor){
@@ -48,6 +51,7 @@ int elevator_amIAtFloor(int targetFloor){
 int elevator_amIAtAnyFloor(){
     for (int i = 0; i < NUMBER_OF_FLOORS; i++){
        if(hardware_read_floor_sensor(i)){
+            g_FLOOR = i;
             return 1;      
         }
     }
@@ -100,5 +104,34 @@ void elevator_setRelativePosition(HardwareMovement moveDirection){
         else if (relative_position != AT && (elevator_amIAtAnyFloor())){
             relative_position = AT;
         } 
+    }
+}
+
+void elevator_stopMotor(){
+    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+}
+void elevator_goDown() {
+    hardware_command_movement(HARDWARE_MOVEMENT_DOWN);
+    currentMoveDirection = HARDWARE_MOVEMENT_DOWN;
+}
+
+void elevator_goUp() {
+    hardware_command_movement(HARDWARE_MOVEMENT_UP);
+    currentMoveDirection = HARDWARE_MOVEMENT_UP;
+}
+
+void elevator_openDoors(){
+    hardware_command_door_open(1);
+}
+
+void elevator_closeDoors(){
+    hardware_command_door_open(0);
+}
+
+void elevator_handleOrder() {
+    for (int i = 11; i > -1; i--) { //hardcoded queuesize
+        if (orderQueue[i].floor == g_FLOOR) {
+            orderQueue_deleteByShiftingAtIndex(i);
+        }
     }
 }
