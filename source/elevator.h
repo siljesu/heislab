@@ -8,11 +8,26 @@
 #define NUMBER_OF_FLOORS 4
 #define NUMBER_OF_ORDER_TYPES 3
 
+typedef enum
+{
+    BELOW,
+    ABOVE,
+    AT
+} RelativePosition; //1 for above current floor, 0 for below current floor
 
-typedef enum {BELOW, ABOVE, AT} RelativePosition; //1 for above current floor, 0 for below current floor
-extern RelativePosition relative_position;
+extern RelativePosition relativePosition;
 //static RelativePosition* p_relative_position;
-typedef enum {IDLE, MOVE, HANDLE_ORDER, DOORS_OPEN_TIMER, EMERGENCY_STOP} State;
+extern int g_FLOOR;
+extern HardwareMovement currentMoveDirection;
+
+typedef enum
+{
+    IDLE,
+    MOVE,
+    HANDLE_ORDER,
+    DOORS_OPEN_TIMER,
+    EMERGENCY_STOP
+} State;
 
 /**
 * @brief state function pointer typedefed. 

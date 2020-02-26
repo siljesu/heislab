@@ -19,7 +19,7 @@ int orderQueue_empty(){
 }
 
 void orderQueue_deleteByShiftingAtIndex(int i){
-	order_delete(orderQueue[i]);
+	orderQueue[i] = order_delete(orderQueue[i]);
 	for (int j = i; j < (QUEUE_SIZE - 1); j++){
 		orderQueue[j] = order_copy(orderQueue[j + 1]);
 	}
