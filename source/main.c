@@ -6,9 +6,9 @@
 
 #define DOORS_OPEN_TIME 3000
 
-int g_FLOOR;
+//int g_FLOOR;
 
-HardwareMovement currentMoveDirection;
+//HardwareMovement currentMoveDirection;
 
 static void sigint_handler(int sig)
 {
@@ -26,8 +26,8 @@ State s_doorsOpenTimer();
 
 State s_idle()
 {
-    elevator_setRelativePosition(currentMoveDirection);
-    elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
+    elevator_setRelativePosition(g_currentMoveDirection);
+    elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
     if (hardware_read_stop_signal() && elevator_amIAtAnyFloor())
     {
@@ -52,7 +52,7 @@ State s_idle()
     }
     if (p_firstOrder->floor == g_FLOOR && p_firstOrder->activeOrder)
     {
-        switch (relativePosition)
+        switch (g_relativePosition)
         {
         case BELOW:
             elevator_goUp();
@@ -63,7 +63,7 @@ State s_idle()
             return MOVE;
             break;
         case AT:
-            //elevator_stopMotor();
+            elevator_stopMotor();
             return HANDLE_ORDER;
             break;
         }
@@ -73,8 +73,8 @@ State s_idle()
 
 State s_move()
 {
-    elevator_setRelativePosition(currentMoveDirection);
-    elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
+    elevator_setRelativePosition(g_currentMoveDirection);
+    elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
     g_FLOOR = elevator_findCurrentFloor(g_FLOOR); // here floor inicator is set, bad decision?
 
@@ -105,7 +105,7 @@ State s_doorsOpenTimer()
     while (startTime + DOORS_OPEN_TIME >= clock() * 1000 / CLOCKS_PER_SEC)
     {
 
-        elevator_checkAndAddOrder(g_FLOOR, currentMoveDirection);
+        elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
         if (hardware_read_stop_signal() && elevator_amIAtAnyFloor())
         {
@@ -118,8 +118,6 @@ State s_doorsOpenTimer()
             return DOORS_OPEN_TIMER;
         }
     }
-
-    hardware_command_stop_light(0);
 
     elevator_closeDoors();
     return IDLE;

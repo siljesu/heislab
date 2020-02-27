@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include "elevator.h"
 
-RelativePosition relativePosition;
+RelativePosition g_relativePosition;
 int g_FLOOR;
-HardwareMovement currentMoveDirection;
+HardwareMovement g_currentMoveDirection;
 
 void elevator_init()
 {
-    relativePosition = ABOVE; //because elevator always starts driving down
+    g_relativePosition = ABOVE; //because elevator always starts driving down
     hardware_command_clear_all_order_lights();
 
     int local_queue_size = 12;
@@ -38,10 +38,12 @@ int elevator_findCurrentFloor(int lastFloor)
     {
         if (hardware_read_floor_sensor(f))
         {
+            g_FLOOR = f;
             hardware_command_floor_indicator_on(f);
             return f;
         }
     }
+    g_FLOOR = lastFloor;
     return lastFloor;
 }
 
@@ -111,24 +113,24 @@ void elevator_setRelativePosition(HardwareMovement moveDirection)
 {
     if (moveDirection == HARDWARE_MOVEMENT_UP)
     {
-        if (relativePosition == AT && (!elevator_amIAtAnyFloor()))
+        if (g_relativePosition == AT && (!elevator_amIAtAnyFloor()))
         {
-            relativePosition = ABOVE;
+            g_relativePosition = ABOVE;
         }
-        else if (relativePosition != AT && (elevator_amIAtAnyFloor()))
+        else if (g_relativePosition != AT && (elevator_amIAtAnyFloor()))
         {
-            relativePosition = AT;
+            g_relativePosition = AT;
         }
     }
     if (moveDirection == HARDWARE_MOVEMENT_DOWN)
     {
-        if (relativePosition == AT && (!elevator_amIAtAnyFloor()))
+        if (g_relativePosition == AT && (!elevator_amIAtAnyFloor()))
         {
-            relativePosition = BELOW;
+            g_relativePosition = BELOW;
         }
-        else if (relativePosition != AT && (elevator_amIAtAnyFloor()))
+        else if (g_relativePosition != AT && (elevator_amIAtAnyFloor()))
         {
-            relativePosition = AT;
+            g_relativePosition = AT;
         }
     }
 }
@@ -140,13 +142,13 @@ void elevator_stopMotor()
 void elevator_goDown()
 {
     hardware_command_movement(HARDWARE_MOVEMENT_DOWN);
-    currentMoveDirection = HARDWARE_MOVEMENT_DOWN;
+    g_currentMoveDirection = HARDWARE_MOVEMENT_DOWN;
 }
 
 void elevator_goUp()
 {
     hardware_command_movement(HARDWARE_MOVEMENT_UP);
-    currentMoveDirection = HARDWARE_MOVEMENT_UP;
+    g_currentMoveDirection = HARDWARE_MOVEMENT_UP;
 }
 
 void elevator_openDoors()

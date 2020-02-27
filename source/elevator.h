@@ -15,10 +15,10 @@ typedef enum
     AT
 } RelativePosition; //1 for above current floor, 0 for below current floor
 
-extern RelativePosition relativePosition;
+extern RelativePosition g_relativePosition;
 //static RelativePosition* p_relative_position;
 extern int g_FLOOR;
-extern HardwareMovement currentMoveDirection;
+extern HardwareMovement g_currentMoveDirection;
 
 typedef enum
 {
