@@ -29,13 +29,13 @@ State s_idle()
     elevator_setRelativePosition(g_currentMoveDirection);
     elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
-    if (hardware_read_stop_signal() && elevator_amIAtAnyFloor())
+    if (elevator_stopSignal() && elevator_amIAtAnyFloor())
     {
         elevator_stopMotor();
         elevator_openDoors();
         return EMERGENCY_STOP;
     }
-    if (hardware_read_stop_signal() && !elevator_amIAtAnyFloor())
+    if (elevator_stopSignal() && !elevator_amIAtAnyFloor())
     {
         elevator_stopMotor();
         return EMERGENCY_STOP;
@@ -76,15 +76,15 @@ State s_move()
     elevator_setRelativePosition(g_currentMoveDirection);
     elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
-    g_FLOOR = elevator_findCurrentFloor(g_FLOOR); // here floor inicator is set, bad decision?
-
-    if (hardware_read_stop_signal() && elevator_amIAtAnyFloor())
+     // here floor inicator is set, bad decision?
+    g_FLOOR = elevator_findCurrentFloor(g_FLOOR);
+    if (elevator_stopSignal() && elevator_amIAtAnyFloor())
     {
         elevator_stopMotor();
         elevator_openDoors();
         return EMERGENCY_STOP;
     }
-    if (hardware_read_stop_signal() && !elevator_amIAtAnyFloor())
+    if (elevator_stopSignal() && !elevator_amIAtAnyFloor())
     {
         elevator_stopMotor();
         return EMERGENCY_STOP;
@@ -99,26 +99,28 @@ State s_move()
 
 State s_doorsOpenTimer()
 { //OPEN DOORS OUTSIDE OF OPEN DOORS? (IN TRANSITION)
-
     time_t startTime = clock() * 1000 / CLOCKS_PER_SEC;
 
     while (startTime + DOORS_OPEN_TIME >= clock() * 1000 / CLOCKS_PER_SEC)
     {
-
         elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
-        if (hardware_read_stop_signal() && elevator_amIAtAnyFloor())
+        if (elevator_stopSignal() && elevator_amIAtAnyFloor())
         {
             elevator_stopMotor();
             elevator_openDoors();
             return EMERGENCY_STOP;
         }
-        if (hardware_read_obstruction_signal())
+        if (elevator_obstruction())
         { //unefficient to start timer every time?
             return DOORS_OPEN_TIMER;
         }
-    }
 
+        if (elevator_ordersAtThisFloor()) {
+            return HANDLE_ORDER;
+        }
+
+    }
     elevator_closeDoors();
     return IDLE;
 }
@@ -126,9 +128,10 @@ State s_doorsOpenTimer()
 State s_handleOrder()
 {
     
-    elevator_handleOrder(); //Must be skipping this line??
-
+    elevator_handleOrder(); //First round: doesn't handle orders, enters s_doorsOpen. Second round: handles the orders, enters s_dorsOpen => 3 sec, order handled, 3 sec, doors closed
+    
     elevator_openDoors();
+    
     return DOORS_OPEN_TIMER;
     //------------------------ Trenger handle order deale med emergency signal osv? --------------------------------------------------------------
 }
@@ -139,13 +142,13 @@ State s_emergencyStop()
     orderQueue_clear();
     hardware_command_stop_light(1);
 
-    if (!hardware_read_stop_signal() && elevator_amIAtAnyFloor())
+    if (!elevator_stopSignal() && elevator_amIAtAnyFloor())
     {
         elevator_openDoors();
         hardware_command_stop_light(0);
         return DOORS_OPEN_TIMER;
     }
-    if (!hardware_read_stop_signal() && !elevator_amIAtAnyFloor())
+    if (!elevator_stopSignal() && !elevator_amIAtAnyFloor())
     {
         hardware_command_stop_light(0);
         return IDLE;

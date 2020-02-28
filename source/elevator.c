@@ -53,6 +53,8 @@ int elevator_amIAtFloor(int targetFloor)
     {
         if (hardware_read_floor_sensor(i) && (i == targetFloor))
         {
+            g_FLOOR = i;
+            hardware_command_floor_indicator_on(i);
             return 1;
         }
     }
@@ -66,6 +68,7 @@ int elevator_amIAtAnyFloor()
         if (hardware_read_floor_sensor(i))
         {
             g_FLOOR = i;
+            hardware_command_floor_indicator_on(i);
             return 1;
         }
     }
@@ -78,32 +81,29 @@ void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection)
     {
         if (hardware_read_order(i, HARDWARE_ORDER_UP))
         {
-            Order order = {order_init(i, HARDWARE_ORDER_UP).floor, order_init(i, HARDWARE_ORDER_UP).order_type, order_init(i, HARDWARE_ORDER_UP).activeOrder};
+            Order order = order_init(i,HARDWARE_ORDER_UP);
             if (order_checkUnique(order))
             {
-                Order *p_order = &order;
-                orderQueue_addOrder(p_order, currentFloor, moveDirection);
-                order_toggleUnique(order, 1);
+                orderQueue_addOrder(order, currentFloor, moveDirection);
+                order_toggleUnique(order,1);
             }
         }
         if (hardware_read_order(i, HARDWARE_ORDER_DOWN))
         {
-            Order order = {order_init(i, HARDWARE_ORDER_DOWN).floor, order_init(i, HARDWARE_ORDER_DOWN).order_type, order_init(i, HARDWARE_ORDER_DOWN).activeOrder};
+            Order order = order_init(i,HARDWARE_ORDER_DOWN);
             if (order_checkUnique(order))
             {
-                Order *p_order = &order;
-                orderQueue_addOrder(p_order, currentFloor, moveDirection);
-                order_toggleUnique(order, 1);
+                orderQueue_addOrder(order, currentFloor, moveDirection);    
+                order_toggleUnique(order,1);
             }
         }
         if (hardware_read_order(i, HARDWARE_ORDER_INSIDE))
         {
-            Order order = {order_init(i, HARDWARE_ORDER_INSIDE).floor, order_init(i, HARDWARE_ORDER_INSIDE).order_type, order_init(i, HARDWARE_ORDER_INSIDE).activeOrder};
+            Order order = order_init(i,HARDWARE_ORDER_INSIDE);
             if (order_checkUnique(order))
             {
-                Order *p_order = &order;
-                orderQueue_addOrder(p_order, currentFloor, moveDirection);
-                order_toggleUnique(order, 1);
+                orderQueue_addOrder(order, currentFloor, moveDirection);    
+                order_toggleUnique(order,1);
             }
         }
     }
@@ -170,4 +170,22 @@ void elevator_handleOrder()
             orderQueue_deleteByShiftingAtIndex(i);
         }
     }
+}
+
+int elevator_ordersAtThisFloor() {
+    for (int i = 11; i > -1; i--){ //hardcoded queuesize
+        if ((orderQueue[i].floor == g_FLOOR) && orderQueue[i].activeOrder)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int elevator_obstruction() {
+    return hardware_read_obstruction_signal();
+}
+
+int elevator_stopSignal() {
+    return hardware_read_stop_signal();
 }

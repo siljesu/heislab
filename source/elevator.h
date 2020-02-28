@@ -91,3 +91,9 @@ void elevator_openDoors();
 void elevator_closeDoors();
 
 void elevator_handleOrder();
+
+int elevator_ordersAtThisFloor();
+
+int elevator_obstruction();
+
+int elevator_stopSignal();

@@ -241,8 +241,8 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 	orderQueue_sortChunksByDirection(countUp, countDown, countSecondUp, countSecondDown, direction);
 }
 
-int orderQueue_addOrder(Order* order, int elevator_floor, HardwareMovement direction){
-	orderQueue[QUEUE_SIZE-1] = order_copy(*order);
+int orderQueue_addOrder(Order order, int elevator_floor, HardwareMovement direction){
+	orderQueue[QUEUE_SIZE-1] = order_copy(order);
 	orderQueue_sortOrderQueue(elevator_floor, direction);
 	orderQueue[QUEUE_SIZE-1] = order_delete(orderQueue[QUEUE_SIZE-1]);
 	return 0;
