@@ -3,13 +3,11 @@
  * @brief Order queue functionality
  *
  */
-
-#include <stdbool.h> //Exists in order.h. Remove once merged properly
 #include "order.h"
 
 
 /**
- * @brief Table to hold up to 12 orders (12 is the max possible), sorted after proximity in the elevator's current path.
+ * @brief Table to hold up to 12 orders (12 is the max theoretical possible), sorted after proximity in the elevator's current path.
  */
 Order orderQueue[12];
 extern Order* p_firstOrder;
