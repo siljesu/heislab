@@ -14,7 +14,7 @@ static void sigint_handler(int sig)
 {
     (void)(sig);
     printf("Terminating elevator\n");
-    hardware_command_movement(HARDWARE_MOVEMENT_STOP);
+    void elevator_stopMotor();
     exit(0);
 }
 
@@ -140,17 +140,17 @@ State s_emergencyStop()
 {
 
     orderQueue_clear();
-    hardware_command_stop_light(1);
+    elevator_stopLightOn();
 
     if (!elevator_stopSignal() && elevator_amIAtAnyFloor())
     {
         elevator_openDoors();
-        hardware_command_stop_light(0);
+        elevator_stopLightOff();
         return DOORS_OPEN_TIMER;
     }
     if (!elevator_stopSignal() && !elevator_amIAtAnyFloor())
     {
-        hardware_command_stop_light(0);
+        elevator_stopLightOff();
         return IDLE;
     }
     return EMERGENCY_STOP;

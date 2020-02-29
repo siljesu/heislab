@@ -189,3 +189,11 @@ int elevator_obstruction() {
 int elevator_stopSignal() {
     return hardware_read_stop_signal();
 }
+
+void elevator_stopLightOff(){
+    hardware_command_stop_light(0);
+}
+
+void elevator_stopLightOn(){
+    hardware_command_stop_light(0);
+}

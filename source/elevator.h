@@ -97,3 +97,7 @@ int elevator_ordersAtThisFloor();
 int elevator_obstruction();
 
 int elevator_stopSignal();
+
+void elevator_stopLightOff();
+
+void elevator_stopLightOn();
