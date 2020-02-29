@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "elevator.h"
 
+#define QUEUE_SIZE 12
 RelativePosition g_relativePosition;
 int g_FLOOR;
 HardwareMovement g_currentMoveDirection;
@@ -163,7 +164,7 @@ void elevator_closeDoors()
 
 void elevator_handleOrder()
 {
-    for (int i = 11; i > -1; i--)
+    for (int i = (QUEUE_SIZE); i > -1; i--)
     { //hardcoded queuesize
         if ((orderQueue[i].floor == g_FLOOR) && orderQueue[i].activeOrder)
         {
@@ -173,7 +174,7 @@ void elevator_handleOrder()
 }
 
 int elevator_ordersAtThisFloor() {
-    for (int i = 11; i > -1; i--){ //hardcoded queuesize
+    for (int i = (QUEUE_SIZE); i > -1; i--){
         if ((orderQueue[i].floor == g_FLOOR) && orderQueue[i].activeOrder)
         {
             return 1;

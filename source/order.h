@@ -12,7 +12,7 @@
 extern int orderTable[4][3];
 
 /**
- * @brief Type used in the array OrderQueue (see orderQueue.h), which in turn is used to keep track of all current orders.
+ * @brief Type used in the array orderQueue (see orderQueue.h), which in turn is used to keep track of all current orders.
  */
 typedef struct{
 
