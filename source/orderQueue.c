@@ -1,7 +1,8 @@
-#include <stdio.h> //undersøk om nødvendig å inkludere
+#include <stdio.h>
 #include "orderQueue.h"
 
-int QUEUE_SIZE = 12;
+#define QUEUE_SIZE 12
+
 Order* p_firstOrder = &(orderQueue[0]);
 
 void orderQueue_clear(){
@@ -62,7 +63,7 @@ void orderQueue_sortIncrementally(Order* temp_array, bool increasing){
 
 }
 
-//ADD FUNCTIONALITY TO MAKE SURE LAST ORDERS ARE EMPTY ORDERS
+
 void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondUp,int countSecondDown,HardwareMovement direction){
 
 	orderQueue_sortIncrementally(goingUp, true); //sorting incrementally
@@ -94,7 +95,7 @@ void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondU
 				orderQueue[i] = secondGoingUp[i - offset];
 			}
 			
-			offset += countSecondUp; //Extra failsafe
+			offset += countSecondUp; 
 			end_border += countSecondDown;
 			for (int i = offset; i < end_border; i++){
 				orderQueue[i] = secondGoingDown[i - offset];
@@ -125,7 +126,7 @@ void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondU
 				orderQueue[i] = secondGoingDown[i - offset];
 			}
 			
-			offset += countSecondDown; //Extra failsafe
+			offset += countSecondDown; 
 			end_border += countSecondUp;
 			for (int i = offset; i < end_border; i++){
 				orderQueue[i] = secondGoingUp[i - offset];
@@ -142,7 +143,7 @@ void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondU
 
 			break;
 	}
-	for (int i = 0; i < 12; i++){ //Hardcoded queuesize value (12)
+	for (int i = 0; i < QUEUE_SIZE; i++){
 		goingUp[i] = EMPTYORDER;
 		goingDown[i] = EMPTYORDER;
 		secondGoingUp[i] = EMPTYORDER;
@@ -200,7 +201,7 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 				case HARDWARE_ORDER_DOWN:
 
 					if (atFloor){
-						//everything bigger, _including_ current floor
+						//everything lesser, _including_ current floor
 						if ( (order_floor <= elevator_floor) && (order_type == HARDWARE_ORDER_DOWN || order_type == HARDWARE_ORDER_INSIDE) ){
 							goingDown[countDown] = orderQueue[i];
 							countDown++;
@@ -214,7 +215,7 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 							countSecondDown++;
 						}
 					} else {
-						//everything bigger, _not including_ current floor (because elevator is inbetween floors, and current floor isn't representative)
+						//everything lesser, _not including_ current floor (because elevator is inbetween floors, and current floor isn't representative)
 						if ( (order_floor < elevator_floor) && (order_type == HARDWARE_ORDER_DOWN || order_type == HARDWARE_ORDER_INSIDE) ){
 							goingDown[countDown] = orderQueue[i];
 							countDown++;

@@ -6,10 +6,6 @@
 
 #define DOORS_OPEN_TIME 3000
 
-//int g_FLOOR;
-
-//HardwareMovement currentMoveDirection;
-
 static void sigint_handler(int sig)
 {
     (void)(sig);
@@ -76,7 +72,6 @@ State s_move()
     elevator_setRelativePosition(g_currentMoveDirection);
     elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
-     // here floor inicator is set, bad decision?
     g_FLOOR = elevator_findCurrentFloor(g_FLOOR);
     if (elevator_stopSignal() && elevator_amIAtAnyFloor())
     {
@@ -98,7 +93,7 @@ State s_move()
 }
 
 State s_doorsOpenTimer()
-{ //OPEN DOORS OUTSIDE OF OPEN DOORS? (IN TRANSITION)
+{ 
     time_t startTime = clock() * 1000 / CLOCKS_PER_SEC;
 
     while (startTime + DOORS_OPEN_TIME >= clock() * 1000 / CLOCKS_PER_SEC)
@@ -112,7 +107,7 @@ State s_doorsOpenTimer()
             return EMERGENCY_STOP;
         }
         if (elevator_obstruction())
-        { //unefficient to start timer every time?
+        { 
             return DOORS_OPEN_TIMER;
         }
 
@@ -128,12 +123,23 @@ State s_doorsOpenTimer()
 State s_handleOrder()
 {
     
-    elevator_handleOrder(); //First round: doesn't handle orders, enters s_doorsOpen. Second round: handles the orders, enters s_dorsOpen => 3 sec, order handled, 3 sec, doors closed
+    if (elevator_stopSignal() && elevator_amIAtAnyFloor())
+    {
+        elevator_stopMotor();
+        elevator_openDoors();
+        return EMERGENCY_STOP;
+    }
+    if (elevator_stopSignal() && !elevator_amIAtAnyFloor())
+    {
+        elevator_stopMotor();
+        return EMERGENCY_STOP;
+    }
+
+    elevator_handleOrder(); 
     
     elevator_openDoors();
     
     return DOORS_OPEN_TIMER;
-    //------------------------ Trenger handle order deale med emergency signal osv? --------------------------------------------------------------
 }
 
 State s_emergencyStop()
@@ -156,7 +162,6 @@ State s_emergencyStop()
     return EMERGENCY_STOP;
 }
 
-    //-------------------------------------
 
 int main()
 {
