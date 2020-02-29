@@ -34,12 +34,6 @@ static const Order EMPTYORDER = {0,HARDWARE_ORDER_UP,false};
 Order order_init(int floor, HardwareOrder orderType);
 
 /**
- * @brief Turns off corresponing light.
- *
- */
-void order_turnOffLight(Order order);
-
-/**
  * @brief Deletes order by deactivating and turning off order light.
  *
  * @return returns deleted order.

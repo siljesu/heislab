@@ -42,11 +42,13 @@ typedef State (*StateFunction)();
 void elevator_init();
 
 /**
-* @brief Checks if someone places any valid order at any place. Will initialize this order and adds it to orderQueue.
+* @brief Checks if new floor is reached.
 *
-* @param
+* @param targetFloor The last floor you visited
+*
+* @return returns new floor if new signal is read, returns old floor if no new signals are read.
 **/
-void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection);
+int elevator_findCurrentFloor(int lastFloor);
 
 /**
 * @brief Checks if target destination (first element of orderQueue) is reached.
@@ -65,13 +67,11 @@ int elevator_amIAtFloor(int targetFloor);
 int elevator_amIAtAnyFloor();
 
 /**
-* @brief Checks if new floor is reached.
+* @brief Checks if someone places any valid order at any place. Will initialize this order and adds it to orderQueue.
 *
-* @param targetFloor The last floor you visited
-*
-* @return returns new floor if new signal is read, returns old floor if no new signals are read.
+* @param
 **/
-int elevator_findCurrentFloor(int lastFloor);
+void elevator_checkAndAddOrder(int currentFloor, HardwareMovement moveDirection);
 
 /**
 * @brief Sets new relative position when needed. Keeps track of where we are.
@@ -101,3 +101,5 @@ int elevator_stopSignal();
 void elevator_stopLightOff();
 
 void elevator_stopLightOn();
+
+int elevator_checkForStop();

@@ -11,14 +11,6 @@ void orderQueue_clear(){
 	}
 }
 
-int orderQueue_empty(){
-	for (int i = 0; i < (QUEUE_SIZE - 1); i++){
-		if (orderQueue[i].activeOrder)
-			return 0;
-	}
-	return 1;
-}
-
 void orderQueue_deleteByShiftingAtIndex(int i){
 	orderQueue[i] = order_delete(orderQueue[i]);
 	for (int j = i; j < (QUEUE_SIZE - 1); j++){

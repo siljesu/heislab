@@ -24,34 +24,10 @@ Order secondGoingDown[12]; // happens only if already going down
  */
 void orderQueue_clear();
 
-
-/**
- * @brief Checks if ordering queue is empty.
- *
- * @return 1 if empty
- * @return 0 if not empty
-*/
-int orderQueue_empty();
-
 /**
  * @brief shifts every element in the order queue one place towards left, from the index given
  */
 void orderQueue_deleteByShiftingAtIndex(int i);
-
-/**
- * @brief Sorts queue, must be used when adding order.
- */
-void orderQueue_sortIncrementally(Order* temp_array, bool increasing);
-
- /** 
- * @brief Receives "chunks" of sorted arrays, divided by direction. Sorts these in sequence, based on direction.
- */
-void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondUp,int countSecondDown,HardwareMovement direction);
-
-/**
- * @brief Sorts entire order queue, based on direction
- */
-void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction);
 
 /**
  * @brief Adds a single, valid order
