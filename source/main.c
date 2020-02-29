@@ -25,19 +25,18 @@ State s_idle(){
     
     elevator_setRelativePosition(g_currentMoveDirection);
     elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
+    g_targetFloor = p_firstOrder->floor;
 
     if (elevator_checkForStop()){
         return EMERGENCY_STOP;
     }
     
     if (p_firstOrder->floor < g_FLOOR && p_firstOrder->activeOrder){
-        g_targetFloor = p_firstOrder->floor;
         elevator_goDown();
         return MOVE;
     }
     
     if (p_firstOrder->floor > g_FLOOR && p_firstOrder->activeOrder){
-        g_targetFloor = p_firstOrder->floor;
         elevator_goUp();
         return MOVE;
     }
@@ -45,17 +44,14 @@ State s_idle(){
     if (p_firstOrder->floor == g_FLOOR && p_firstOrder->activeOrder){
         switch (g_relativePosition){
         case BELOW:
-            g_targetFloor = p_firstOrder->floor;
             elevator_goUp();
             return MOVE;
             break;
         case ABOVE:
-            g_targetFloor = p_firstOrder->floor;
             elevator_goDown();
             return MOVE;
             break;
         case AT:
-            g_targetFloor = p_firstOrder->floor;
             elevator_stopMotor();
             return HANDLE_ORDER;
             break;
@@ -75,11 +71,15 @@ State s_move(){
             return EMERGENCY_STOP;
         }
         
-        if (elevator_amIAtFloor(p_firstOrder->floor)){
+        if (elevator_amIAtFloor(g_targetFloor)){
             elevator_stopMotor();
             return HANDLE_ORDER;
         }    
     }
+    if (elevator_amIAtFloor(g_targetFloor)){
+        elevator_stopMotor();
+        return HANDLE_ORDER;
+    }   
     /*elevator_setRelativePosition(g_currentMoveDirection);
     elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
