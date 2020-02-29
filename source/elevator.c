@@ -197,3 +197,20 @@ void elevator_stopLightOff(){
 void elevator_stopLightOn(){
     hardware_command_stop_light(0);
 }
+
+int elevator_checkForStop(){
+    if (elevator_stopSignal() && elevator_amIAtAnyFloor())
+    {
+        elevator_stopMotor();
+        elevator_openDoors();
+        return 1;
+        //return EMERGENCY_STOP;
+    }
+    if (elevator_stopSignal() && !elevator_amIAtAnyFloor())
+    {
+        elevator_stopMotor();
+        return 1;
+        //return EMERGENCY_STOP;
+    }
+    return 0;
+}
