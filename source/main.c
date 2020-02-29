@@ -13,6 +13,8 @@ static void sigint_handler(int sig){
     exit(0);
 }
 
+int g_targetFloor;
+
 State s_idle();
 State s_move();
 State s_handleOrder();
@@ -29,11 +31,13 @@ State s_idle(){
     }
     
     if (p_firstOrder->floor < g_FLOOR && p_firstOrder->activeOrder){
+        g_targetFloor = p_firstOrder->floor;
         elevator_goDown();
         return MOVE;
     }
     
     if (p_firstOrder->floor > g_FLOOR && p_firstOrder->activeOrder){
+        g_targetFloor = p_firstOrder->floor;
         elevator_goUp();
         return MOVE;
     }
@@ -41,14 +45,17 @@ State s_idle(){
     if (p_firstOrder->floor == g_FLOOR && p_firstOrder->activeOrder){
         switch (g_relativePosition){
         case BELOW:
+            g_targetFloor = p_firstOrder->floor;
             elevator_goUp();
             return MOVE;
             break;
         case ABOVE:
+            g_targetFloor = p_firstOrder->floor;
             elevator_goDown();
             return MOVE;
             break;
         case AT:
+            g_targetFloor = p_firstOrder->floor;
             elevator_stopMotor();
             return HANDLE_ORDER;
             break;
@@ -58,8 +65,22 @@ State s_idle(){
 }
 
 State s_move(){
+    while(!elevator_amIAtFloor(g_targetFloor)){
+        elevator_setRelativePosition(g_currentMoveDirection);
+        elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
-    elevator_setRelativePosition(g_currentMoveDirection);
+        g_FLOOR = elevator_findCurrentFloor(g_FLOOR);
+        
+        if (elevator_checkForStop()){
+            return EMERGENCY_STOP;
+        }
+        
+        if (elevator_amIAtFloor(p_firstOrder->floor)){
+            elevator_stopMotor();
+            return HANDLE_ORDER;
+        }    
+    }
+    /*elevator_setRelativePosition(g_currentMoveDirection);
     elevator_checkAndAddOrder(g_FLOOR, g_currentMoveDirection);
 
     g_FLOOR = elevator_findCurrentFloor(g_FLOOR);
@@ -71,7 +92,7 @@ State s_move(){
     if (elevator_amIAtFloor(p_firstOrder->floor)){
         elevator_stopMotor();
         return HANDLE_ORDER;
-    }
+    }*/
     
     return IDLE;
 }

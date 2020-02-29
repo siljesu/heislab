@@ -8,6 +8,9 @@
 #define NUMBER_OF_FLOORS 4
 #define NUMBER_OF_ORDER_TYPES 3
 
+/**
+* @brief Enum that is determined, so the elevator can know whether it's above, at or below a floor, in a more robust manner, than trusting solely on direction and last floor.
+**/
 typedef enum
 {
     BELOW,
