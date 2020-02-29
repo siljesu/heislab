@@ -3,8 +3,6 @@
 
 #define QUEUE_SIZE 12
 
-Order* p_firstOrder = &(orderQueue[0]);
-
 void orderQueue_clear(){
 	for (int i = 0; i < QUEUE_SIZE ; i++){
 		orderQueue[i] = order_delete(orderQueue[i]);

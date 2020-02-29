@@ -5,9 +5,6 @@
 
 #include "orderQueue.h"
 
-#define NUMBER_OF_FLOORS 4
-#define NUMBER_OF_ORDER_TYPES 3
-
 typedef enum
 {
     BELOW,
@@ -149,3 +146,13 @@ void elevator_stopLightOn();
 * @return 1 if criteria are met, 0 if not.
 **/
 int elevator_checkForStop();
+
+/**
+* @brief Turns all orders' lights off.
+*/
+void elevator_clearAllOrderLights();
+
+/**
+* @brief Deletes all active orders in orderQueue.
+*/
+void elevator_clearAllOrders();

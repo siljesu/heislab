@@ -2,15 +2,19 @@
 #include <stdlib.h>
 #include "elevator.h"
 
+#define NUMBER_OF_FLOORS 4
+#define NUMBER_OF_ORDER_TYPES 3
 #define QUEUE_SIZE 12
+Order* p_firstOrder = &(orderQueue[0]);
 RelativePosition g_relativePosition;
 int g_FLOOR;
 HardwareMovement g_currentMoveDirection;
+void elevator_clearAllOrderLights();
 
 void elevator_init()
 {
     g_relativePosition = ABOVE; //because elevator always starts driving down
-    hardware_command_clear_all_order_lights();
+    elevator_clearAllOrderLights();
 
     int local_queue_size = 12;
     for (int i = 0; i < (local_queue_size); i++)
@@ -205,13 +209,30 @@ int elevator_checkForStop(){
         elevator_stopMotor();
         elevator_openDoors();
         return 1;
-        //return EMERGENCY_STOP;
     }
     if (elevator_stopSignal() && !elevator_amIAtAnyFloor())
     {
         elevator_stopMotor();
         return 1;
-        //return EMERGENCY_STOP;
     }
     return 0;
+}
+
+void elevator_clearAllOrderLights(){
+    HardwareOrder order_types[3] = {
+        HARDWARE_ORDER_UP,
+        HARDWARE_ORDER_INSIDE,
+        HARDWARE_ORDER_DOWN
+    };
+
+    for(int f = 0; f < HARDWARE_NUMBER_OF_FLOORS; f++){
+        for(int i = 0; i < 3; i++){
+            HardwareOrder type = order_types[i];
+            hardware_command_order_light(f, type, 0);
+        }
+    }
+}
+
+void elevator_clearAllOrders(){
+    orderQueue_clear();
 }

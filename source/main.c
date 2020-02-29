@@ -19,6 +19,7 @@ State s_handleOrder();
 State s_emergencyStop();
 State s_doorsOpenTimer();
 
+
 State s_idle(){
     
     elevator_setRelativePosition(g_currentMoveDirection);
@@ -115,7 +116,7 @@ State s_handleOrder(){
 State s_emergencyStop(){
 
     elevator_stopLightOn();
-    orderQueue_clear();
+    elevator_clearAllOrders();
 
     if (!elevator_stopSignal() && elevator_amIAtAnyFloor()){
         elevator_openDoors();
