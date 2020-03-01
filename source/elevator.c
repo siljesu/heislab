@@ -4,16 +4,20 @@
 
 #define NUMBER_OF_FLOORS 4
 #define NUMBER_OF_ORDER_TYPES 3
+
+#ifndef QUEUE_SIZE
 #define QUEUE_SIZE 12
-Order* p_firstOrder = &(orderQueue[0]);
-RelativePosition g_relativePosition;
+#endif
+
 int g_FLOOR;
 HardwareMovement g_currentMoveDirection;
+Order* p_firstOrder = &(orderQueue[0]);
+
 void elevator_clearAllOrderLights();
 
 void elevator_init()
 {
-    g_relativePosition = ABOVE; //because elevator always starts driving down
+    g_relativePosition = ABOVE; //Elevator set to always start by driving down
     elevator_clearAllOrderLights();
 
     int local_queue_size = 12;
@@ -169,7 +173,7 @@ void elevator_closeDoors()
 void elevator_handleOrder()
 {
     for (int i = (QUEUE_SIZE); i > -1; i--)
-    { //hardcoded queuesize
+    {
         if ((orderQueue[i].floor == g_FLOOR) && orderQueue[i].activeOrder)
         {
             orderQueue_deleteByShiftingAtIndex(i);
@@ -200,7 +204,7 @@ void elevator_stopLightOff(){
 }
 
 void elevator_stopLightOn(){
-    hardware_command_stop_light(0);
+    hardware_command_stop_light(1);
 }
 
 int elevator_checkForStop(){

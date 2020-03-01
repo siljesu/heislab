@@ -1,0 +1,102 @@
+\hypertarget{orderQueue_8h}{}\section{source/order\+Queue.h File Reference}
+\label{orderQueue_8h}\index{source/order\+Queue.\+h@{source/order\+Queue.\+h}}
+
+
+\hyperlink{structOrder}{Order} queue functionality.  
+
+
+{\ttfamily \#include \char`\"{}order.\+h\char`\"{}}\newline
+Include dependency graph for order\+Queue.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{orderQueue_8h_a6d79531f3f1e648de522a994019972cc}\label{orderQueue_8h_a6d79531f3f1e648de522a994019972cc}} 
+enum \hyperlink{orderQueue_8h_a6d79531f3f1e648de522a994019972cc}{Relative\+Position} \{ {\bfseries B\+E\+L\+OW}, 
+{\bfseries A\+B\+O\+VE}, 
+{\bfseries AT}
+ \}\begin{DoxyCompactList}\small\item\em Enum type that contains the elevator\textquotesingle{}s possible relative positions, relative to it\textquotesingle{}s last floor (g\+\_\+\+F\+L\+O\+OR, see \hyperlink{elevator_8h}{elevator.\+h}) \end{DoxyCompactList}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{orderQueue_8h_a99302be8c70450b60f46185e5e53ab9c}\label{orderQueue_8h_a99302be8c70450b60f46185e5e53ab9c}} 
+void \hyperlink{orderQueue_8h_a99302be8c70450b60f46185e5e53ab9c}{order\+Queue\+\_\+clear} ()
+\begin{DoxyCompactList}\small\item\em Clears all orders in queue. \end{DoxyCompactList}\item 
+void \hyperlink{orderQueue_8h_a9f8ea82aa0c78f6cd959a832ef6a9619}{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index} (int i)
+\begin{DoxyCompactList}\small\item\em shifts every element in the order queue one place towards left (towards lower indices), from the index given. \end{DoxyCompactList}\item 
+void \hyperlink{orderQueue_8h_a5634d55a8f3d8dd98545e3396da6f550}{order\+Queue\+\_\+add\+Order} (\hyperlink{structOrder}{Order} order, int elevator\+\_\+floor, \hyperlink{hardware_8h_a2167c399a24df296afc432bcb88228af}{Hardware\+Movement} direction)
+\begin{DoxyCompactList}\small\item\em Adds a single, valid order, then sorts entire order\+Queue. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{orderQueue_8h_a01edbc2bb4a2c6bdbc6a1f38c86f416f}\label{orderQueue_8h_a01edbc2bb4a2c6bdbc6a1f38c86f416f}} 
+\hyperlink{orderQueue_8h_a6d79531f3f1e648de522a994019972cc}{Relative\+Position} \hyperlink{orderQueue_8h_a01edbc2bb4a2c6bdbc6a1f38c86f416f}{g\+\_\+relative\+Position}
+\begin{DoxyCompactList}\small\item\em Global variable that holds the elevator\textquotesingle{}s current relative position. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{orderQueue_8h_aef1d519bbd120cba867daaac745bcda4}\label{orderQueue_8h_aef1d519bbd120cba867daaac745bcda4}} 
+\hyperlink{structOrder}{Order} \hyperlink{orderQueue_8h_aef1d519bbd120cba867daaac745bcda4}{order\+Queue} \mbox{[}12\mbox{]}
+\begin{DoxyCompactList}\small\item\em Global array to hold up to 12 orders (12 is the max theoretical possible), sorted after proximity to the elevator\textquotesingle{}s current position, and according to current direction. Used to keep track of all current orders. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{orderQueue_8h_a947a7065cf4559aa8a3757f63b49ac6b}\label{orderQueue_8h_a947a7065cf4559aa8a3757f63b49ac6b}} 
+\hyperlink{structOrder}{Order} \hyperlink{orderQueue_8h_a947a7065cf4559aa8a3757f63b49ac6b}{going\+Up} \mbox{[}12\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array to hold all orders that need to be handled next time elevator is going up. This can be immediately, but also in second turn after elevator has already gone down, if its initial direction was down (in accordance with requirements). Used in {\ttfamily order\+Queue\+\_\+sort\+Order\+Queue} and {\ttfamily order\+Queue\+\_\+sort\+Chunks\+By\+Direction}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{orderQueue_8h_ae9996e4201e2a2eca860b8b1fd6a2aad}\label{orderQueue_8h_ae9996e4201e2a2eca860b8b1fd6a2aad}} 
+\hyperlink{structOrder}{Order} \hyperlink{orderQueue_8h_ae9996e4201e2a2eca860b8b1fd6a2aad}{going\+Down} \mbox{[}12\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array to hold all orders that need to be handled next time elevator is going down. This can be immediately, but also in second turn after elevator has already gone up, if its initial direction was up (in accordance with requirements). Used in {\ttfamily order\+Queue\+\_\+sort\+Order\+Queue} and {\ttfamily order\+Queue\+\_\+sort\+Chunks\+By\+Direction}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{orderQueue_8h_a79b143a153f51b8cd6797922835c7167}\label{orderQueue_8h_a79b143a153f51b8cd6797922835c7167}} 
+\hyperlink{structOrder}{Order} \hyperlink{orderQueue_8h_a79b143a153f51b8cd6797922835c7167}{second\+Going\+Up} \mbox{[}12\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array to hold all orders that need to be handled in the elevator\textquotesingle{}s \char`\"{}second round up\char`\"{}. Only used when elevator\textquotesingle{}s direction is up. Used in {\ttfamily order\+Queue\+\_\+sort\+Order\+Queue} and {\ttfamily order\+Queue\+\_\+sort\+Chunks\+By\+Direction}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{orderQueue_8h_aa378f7f96761b5ece08108df025bc614}\label{orderQueue_8h_aa378f7f96761b5ece08108df025bc614}} 
+\hyperlink{structOrder}{Order} \hyperlink{orderQueue_8h_aa378f7f96761b5ece08108df025bc614}{second\+Going\+Down} \mbox{[}12\mbox{]}
+\begin{DoxyCompactList}\small\item\em Array to hold all orders that need to be handled in the elevator\textquotesingle{}s \char`\"{}second round down\char`\"{}. Only used when elevator\textquotesingle{}s direction is down. Used in {\ttfamily order\+Queue\+\_\+sort\+Order\+Queue} and {\ttfamily order\+Queue\+\_\+sort\+Chunks\+By\+Direction}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{structOrder}{Order} queue functionality. 
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{orderQueue_8h_a5634d55a8f3d8dd98545e3396da6f550}\label{orderQueue_8h_a5634d55a8f3d8dd98545e3396da6f550}} 
+\index{order\+Queue.\+h@{order\+Queue.\+h}!order\+Queue\+\_\+add\+Order@{order\+Queue\+\_\+add\+Order}}
+\index{order\+Queue\+\_\+add\+Order@{order\+Queue\+\_\+add\+Order}!order\+Queue.\+h@{order\+Queue.\+h}}
+\subsubsection{\texorpdfstring{order\+Queue\+\_\+add\+Order()}{orderQueue\_addOrder()}}
+{\footnotesize\ttfamily void order\+Queue\+\_\+add\+Order (\begin{DoxyParamCaption}\item[{\hyperlink{structOrder}{Order}}]{order,  }\item[{int}]{elevator\+\_\+floor,  }\item[{\hyperlink{hardware_8h_a2167c399a24df296afc432bcb88228af}{Hardware\+Movement}}]{direction }\end{DoxyParamCaption})}
+
+
+
+Adds a single, valid order, then sorts entire order\+Queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & The order that is to be added to the queue.\\
+\hline
+{\em elevator\+\_\+floor} & The elevator\textquotesingle{}s current floor upon request to add the order.\\
+\hline
+{\em direction} & The elevator\textquotesingle{}s current direction upon request to add the order. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 250 of file order\+Queue.\+c.
+
+\mbox{\Hypertarget{orderQueue_8h_a9f8ea82aa0c78f6cd959a832ef6a9619}\label{orderQueue_8h_a9f8ea82aa0c78f6cd959a832ef6a9619}} 
+\index{order\+Queue.\+h@{order\+Queue.\+h}!order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index@{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index}}
+\index{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index@{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index}!order\+Queue.\+h@{order\+Queue.\+h}}
+\subsubsection{\texorpdfstring{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index()}{orderQueue\_deleteByShiftingAtIndex()}}
+{\footnotesize\ttfamily void order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})}
+
+
+
+shifts every element in the order queue one place towards left (towards lower indices), from the index given. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & The index, from which all order\+Queue\textquotesingle{}s elements to the right will be left-\/shifted (i.\+e. shifted towards lower indices) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 16 of file order\+Queue.\+c.
+

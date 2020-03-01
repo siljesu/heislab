@@ -146,7 +146,6 @@ int main()
 
     elevator_init();
 
-
     while (!elevator_amIAtAnyFloor()){
         //Waiting 'till a floor is reached
     }

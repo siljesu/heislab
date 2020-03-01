@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include "orderQueue.h"
 
+#ifndef QUEUE_SIZE
 #define QUEUE_SIZE 12
+#endif
+
+RelativePosition g_relativePosition;
 
 void orderQueue_clear(){
 	for (int i = 0; i < QUEUE_SIZE ; i++){
@@ -17,49 +21,57 @@ void orderQueue_deleteByShiftingAtIndex(int i){
 	orderQueue[QUEUE_SIZE - 1] = EMPTYORDER;
 }
 
-void orderQueue_sortIncrementally(Order* temp_array, bool increasing){
+void orderQueue_selectionSort(Order* temp_array, bool incrementing){
 	Order temp_order;
 	int index;
 
-	if (increasing){
+	if (incrementing){ 
 		for (int i = 0; i < QUEUE_SIZE; i++){
 			index = i;
-			temp_order = *(temp_array + i);
+			temp_order = temp_array[i];
 			for (int j = i; j < QUEUE_SIZE; j++){
-				if ( ((temp_array + j)->activeOrder) && ((temp_array + j)->floor < temp_order.floor) ){
-					temp_order = *(temp_array + j);
+				if ( (temp_array[j].activeOrder) && (temp_array[j].floor < temp_order.floor) ){
+					temp_order = temp_array[j];
 					index = j;
 				}
 			}
-			*(temp_array + index) = *(temp_array + i);
-			*(temp_array + i) = temp_order;
+			temp_array[index] = temp_array[i];
+			temp_array[i] = temp_order;
 		}
 	}
 
-	else if (!increasing){
+	else if (!incrementing){
 		for (int i = 0; i < QUEUE_SIZE; i++){
 			index = i;
-			temp_order = *(temp_array + i);
+			temp_order = temp_array[i];
 			for (int j = i; j < QUEUE_SIZE; j++){
-				if ( ((temp_array + j)->activeOrder) && ((temp_array + j)->floor > temp_order.floor) ){
-					temp_order = *(temp_array + j);
+				if ( (temp_array[j].activeOrder) && (temp_array[j].floor > temp_order.floor) ){
+					temp_order = temp_array[j];
 					index = j;
 				}
 			}
-			*(temp_array + index) = *(temp_array + i);
-			*(temp_array + i) = temp_order;
+			temp_array[index] = temp_array[i];
+			temp_array[i] = temp_order;
 		}
 	}
 
 }
 
+void orderQueue_resetSortingArrays(){
+	for (int i = 0; i < QUEUE_SIZE; i++){
+		goingUp[i] = EMPTYORDER;
+		goingDown[i] = EMPTYORDER;
+		secondGoingUp[i] = EMPTYORDER;
+		secondGoingDown[i] = EMPTYORDER;
+	}
+}
 
 void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondUp,int countSecondDown,HardwareMovement direction){
 
-	orderQueue_sortIncrementally(goingUp, true); //sorting incrementally
-	orderQueue_sortIncrementally(goingDown, false); //sorting decrementally
-	orderQueue_sortIncrementally(secondGoingUp, true); //sorting incrementally
-	orderQueue_sortIncrementally(secondGoingDown, false); //sorting decrementally
+	orderQueue_selectionSort(goingUp, true);
+	orderQueue_selectionSort(goingDown, false);
+	orderQueue_selectionSort(secondGoingUp, true);
+	orderQueue_selectionSort(secondGoingDown, false);
 
 	int offset = 0;
     int end_border;
@@ -90,10 +102,6 @@ void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondU
 			for (int i = offset; i < end_border; i++){
 				orderQueue[i] = secondGoingDown[i - offset];
 			}
-			
-			if (countSecondDown != 0) {
-				printf("ERROR: faulty floor order");
-			}
 			break;
 		
 		case HARDWARE_MOVEMENT_DOWN:
@@ -121,24 +129,16 @@ void orderQueue_sortChunksByDirection(int countUp,int countDown,int countSecondU
 			for (int i = offset; i < end_border; i++){
 				orderQueue[i] = secondGoingUp[i - offset];
 			}
-
-			if (countSecondUp != 0) {
-				printf("ERROR: faulty floor order");
-			}
 			break;
 
 		case HARDWARE_MOVEMENT_STOP:
 
-			printf("ERROR: logic error, movement stop should not happen here: will sort as if going down.");
+			printf("ERROR: logic error, movement stop is not a direction: going into idle.");
 
 			break;
 	}
-	for (int i = 0; i < QUEUE_SIZE; i++){
-		goingUp[i] = EMPTYORDER;
-		goingDown[i] = EMPTYORDER;
-		secondGoingUp[i] = EMPTYORDER;
-		secondGoingDown[i] = EMPTYORDER;
-	}
+
+	orderQueue_resetSortingArrays();
 }
 
 void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
@@ -157,8 +157,8 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 			switch (direction) {
 				case HARDWARE_MOVEMENT_UP:
 
-					if (atFloor){
-						//everything bigger, _including_ current floor
+					//Include orders at current floor
+					if (atFloor){ 
 						if ( (order_floor >= elevator_floor) && (order_type == HARDWARE_ORDER_UP || order_type == HARDWARE_ORDER_INSIDE) ){
 							goingUp[countUp] = orderQueue[i];
 							countUp++;
@@ -171,8 +171,9 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 							secondGoingUp[countSecondUp] = orderQueue[i];
 							countSecondUp++;
 						}
-					} else {
-						//everything bigger, _not including_ current floor (because elevator is inbetween floors, and current floor isn't representative)
+					//Don't include orders at current floor
+					} else { 
+						
 						if ( (order_floor > elevator_floor) && (order_type == HARDWARE_ORDER_UP || order_type == HARDWARE_ORDER_INSIDE) ){
 							goingUp[countUp] = orderQueue[i];
 							countUp++;
@@ -182,16 +183,23 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 							countDown++;
 						}
 						else if ( (order_floor <= elevator_floor) && (order_type == HARDWARE_ORDER_UP) ){
-							secondGoingUp[countSecondUp] = orderQueue[i];
-							countSecondUp++;
+							//As a safeguard, we also need to check relative position
+							if ((g_relativePosition == BELOW) && (order_floor == elevator_floor)){
+								goingUp[countUp] = orderQueue[i];
+								countUp++;
+							}
+							else{
+								secondGoingUp[countSecondUp] = orderQueue[i];
+								countSecondUp++;
+							}
 						}
 					}
 
 					break;
-				case HARDWARE_ORDER_DOWN:
+				case HARDWARE_MOVEMENT_DOWN:
 
+					//Include orders at current floor
 					if (atFloor){
-						//everything lesser, _including_ current floor
 						if ( (order_floor <= elevator_floor) && (order_type == HARDWARE_ORDER_DOWN || order_type == HARDWARE_ORDER_INSIDE) ){
 							goingDown[countDown] = orderQueue[i];
 							countDown++;
@@ -204,8 +212,8 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 							secondGoingDown[countSecondDown] = orderQueue[i];
 							countSecondDown++;
 						}
+					//Don't include orders at current floor
 					} else {
-						//everything lesser, _not including_ current floor (because elevator is inbetween floors, and current floor isn't representative)
 						if ( (order_floor < elevator_floor) && (order_type == HARDWARE_ORDER_DOWN || order_type == HARDWARE_ORDER_INSIDE) ){
 							goingDown[countDown] = orderQueue[i];
 							countDown++;
@@ -215,15 +223,22 @@ void orderQueue_sortOrderQueue(int elevator_floor, HardwareMovement direction){
 							countUp++;
 						}
 						else if ( (order_floor >= elevator_floor) && (order_type == HARDWARE_ORDER_DOWN) ){
-							secondGoingDown[countSecondDown] = orderQueue[i];
-							countSecondDown++;
+							//As a safeguard, we also need to check relative position
+							if ((g_relativePosition == ABOVE) && (order_floor == elevator_floor)){
+								goingDown[countDown] = orderQueue[i];
+								countDown++;
+							}
+							else{
+								secondGoingDown[countSecondDown] = orderQueue[i];
+								countSecondDown++;
+							}	
 						}
 					}
 
 					break;
 				case HARDWARE_MOVEMENT_STOP:
 
-					printf("ERROR: logic error, movement stop should not happen here: will sort as if going down.");
+					printf("ERROR: logic error, movement stop is not a direction: going into idle.");
 
 					break;
 			}
