@@ -1,3 +1,8 @@
+/**
+ * @file
+ * @brief Main file of the elevator. FSM module implementation
+**/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

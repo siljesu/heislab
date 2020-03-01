@@ -1,3 +1,8 @@
+/**
+ * @file
+ * @brief Elevator module's implementation
+**/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "elevator.h"

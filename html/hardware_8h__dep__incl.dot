@@ -4,17 +4,17 @@ digraph "source/hardware.h"
   node [fontname="Helvetica",fontsize="10",shape=record];
   Node1 [label="source/hardware.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
   Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="source/order.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$order_8h.html",tooltip="Order queue functionality. "];
+  Node2 [label="source/order.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$order_8h.html",tooltip="order functionality "];
   Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node3 [label="source/orderQueue.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$orderQueue_8h.html",tooltip="Order queue functionality. "];
+  Node3 [label="source/orderQueue.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$orderQueue_8h.html",tooltip="orderQueue functionality "];
   Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node4 [label="source/elevator.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$elevator_8h.html",tooltip="elevator operations and states are in this file. "];
   Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node5 [label="source/elevator.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$elevator_8c_source.html"];
+  Node5 [label="source/elevator.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$elevator_8c.html",tooltip="Elevator module&#39;s implementation. "];
   Node4 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node6 [label="source/main.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8c_source.html"];
+  Node6 [label="source/main.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$main_8c.html",tooltip="Main file of the elevator. FSM module implementation. "];
   Node3 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node7 [label="source/orderQueue.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$orderQueue_8c_source.html"];
+  Node7 [label="source/orderQueue.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$orderQueue_8c.html",tooltip="orderQueue module&#39;s implementation "];
   Node2 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node8 [label="source/order.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$order_8c_source.html"];
+  Node8 [label="source/order.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$order_8c.html",tooltip="order module&#39;s implementation "];
 }

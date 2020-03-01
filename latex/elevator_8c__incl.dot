@@ -1,0 +1,20 @@
+digraph "source/elevator.c"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node0 [label="source/elevator.c",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node0 -> Node1 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 [label="stdio.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node0 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="stdlib.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node0 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="elevator.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$elevator_8h.html",tooltip="elevator operations and states are in this file. "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="orderQueue.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$orderQueue_8h.html",tooltip="orderQueue functionality "];
+  Node4 -> Node5 [color="midnightblue",fontsize="10",style="solid"];
+  Node5 [label="order.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$order_8h.html",tooltip="order functionality "];
+  Node5 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
+  Node6 [label="hardware.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$hardware_8h.html",tooltip="Driver for the elevator hardware. "];
+  Node5 -> Node7 [color="midnightblue",fontsize="10",style="solid"];
+  Node7 [label="stdbool.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+}

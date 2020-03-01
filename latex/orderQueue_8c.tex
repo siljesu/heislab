@@ -1,0 +1,95 @@
+\hypertarget{orderQueue_8c}{}\section{source/order\+Queue.c File Reference}
+\label{orderQueue_8c}\index{source/order\+Queue.\+c@{source/order\+Queue.\+c}}
+
+
+order\+Queue module\textquotesingle{}s implementation  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}order\+Queue.\+h\char`\"{}}\newline
+Include dependency graph for order\+Queue.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{orderQueue_8c_a142810068f1b99cd93d3fc9f0e160e02}\label{orderQueue_8c_a142810068f1b99cd93d3fc9f0e160e02}} 
+\#define {\bfseries Q\+U\+E\+U\+E\+\_\+\+S\+I\+ZE}~12
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{orderQueue_8c_a99302be8c70450b60f46185e5e53ab9c}\label{orderQueue_8c_a99302be8c70450b60f46185e5e53ab9c}} 
+void \hyperlink{orderQueue_8c_a99302be8c70450b60f46185e5e53ab9c}{order\+Queue\+\_\+clear} ()
+\begin{DoxyCompactList}\small\item\em Clears all orders in queue. \end{DoxyCompactList}\item 
+void \hyperlink{orderQueue_8c_a9f8ea82aa0c78f6cd959a832ef6a9619}{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index} (int i)
+\begin{DoxyCompactList}\small\item\em shifts every element in the order queue one place towards left (towards lower indices), from the index given. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{orderQueue_8c_a051a493b162844f7a2106b37438fd05a}\label{orderQueue_8c_a051a493b162844f7a2106b37438fd05a}} 
+void {\bfseries order\+Queue\+\_\+selection\+Sort} (\hyperlink{structOrder}{Order} $\ast$temp\+\_\+array, bool incrementing)
+\item 
+\mbox{\Hypertarget{orderQueue_8c_a361eb20b6bb39cc4ebeecf6273ef3787}\label{orderQueue_8c_a361eb20b6bb39cc4ebeecf6273ef3787}} 
+void {\bfseries order\+Queue\+\_\+reset\+Sorting\+Arrays} ()
+\item 
+\mbox{\Hypertarget{orderQueue_8c_a35e9265ff996997b22accff0207b3262}\label{orderQueue_8c_a35e9265ff996997b22accff0207b3262}} 
+void {\bfseries order\+Queue\+\_\+sort\+Chunks\+By\+Direction} (int count\+Up, int count\+Down, int count\+Second\+Up, int count\+Second\+Down, \hyperlink{hardware_8h_a2167c399a24df296afc432bcb88228af}{Hardware\+Movement} direction)
+\item 
+\mbox{\Hypertarget{orderQueue_8c_aceeb00ecf313339e1d98c54f4f62f726}\label{orderQueue_8c_aceeb00ecf313339e1d98c54f4f62f726}} 
+void {\bfseries order\+Queue\+\_\+sort\+Order\+Queue} (int elevator\+\_\+floor, \hyperlink{hardware_8h_a2167c399a24df296afc432bcb88228af}{Hardware\+Movement} direction)
+\item 
+void \hyperlink{orderQueue_8c_a5634d55a8f3d8dd98545e3396da6f550}{order\+Queue\+\_\+add\+Order} (\hyperlink{structOrder}{Order} order, int elevator\+\_\+floor, \hyperlink{hardware_8h_a2167c399a24df296afc432bcb88228af}{Hardware\+Movement} direction)
+\begin{DoxyCompactList}\small\item\em Adds a single, valid order, then sorts entire order\+Queue. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{orderQueue_8c_a01edbc2bb4a2c6bdbc6a1f38c86f416f}\label{orderQueue_8c_a01edbc2bb4a2c6bdbc6a1f38c86f416f}} 
+\hyperlink{orderQueue_8h_a6d79531f3f1e648de522a994019972cc}{Relative\+Position} \hyperlink{orderQueue_8c_a01edbc2bb4a2c6bdbc6a1f38c86f416f}{g\+\_\+relative\+Position}
+\begin{DoxyCompactList}\small\item\em Global variable that holds the elevator\textquotesingle{}s current relative position. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+order\+Queue module\textquotesingle{}s implementation 
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{orderQueue_8c_a5634d55a8f3d8dd98545e3396da6f550}\label{orderQueue_8c_a5634d55a8f3d8dd98545e3396da6f550}} 
+\index{order\+Queue.\+c@{order\+Queue.\+c}!order\+Queue\+\_\+add\+Order@{order\+Queue\+\_\+add\+Order}}
+\index{order\+Queue\+\_\+add\+Order@{order\+Queue\+\_\+add\+Order}!order\+Queue.\+c@{order\+Queue.\+c}}
+\subsubsection{\texorpdfstring{order\+Queue\+\_\+add\+Order()}{orderQueue\_addOrder()}}
+{\footnotesize\ttfamily void order\+Queue\+\_\+add\+Order (\begin{DoxyParamCaption}\item[{\hyperlink{structOrder}{Order}}]{order,  }\item[{int}]{elevator\+\_\+floor,  }\item[{\hyperlink{hardware_8h_a2167c399a24df296afc432bcb88228af}{Hardware\+Movement}}]{direction }\end{DoxyParamCaption})}
+
+
+
+Adds a single, valid order, then sorts entire order\+Queue. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & The order that is to be added to the queue.\\
+\hline
+{\em elevator\+\_\+floor} & The elevator\textquotesingle{}s current floor upon request to add the order.\\
+\hline
+{\em direction} & The elevator\textquotesingle{}s current direction upon request to add the order. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 256 of file order\+Queue.\+c.
+
+\mbox{\Hypertarget{orderQueue_8c_a9f8ea82aa0c78f6cd959a832ef6a9619}\label{orderQueue_8c_a9f8ea82aa0c78f6cd959a832ef6a9619}} 
+\index{order\+Queue.\+c@{order\+Queue.\+c}!order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index@{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index}}
+\index{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index@{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index}!order\+Queue.\+c@{order\+Queue.\+c}}
+\subsubsection{\texorpdfstring{order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index()}{orderQueue\_deleteByShiftingAtIndex()}}
+{\footnotesize\ttfamily void order\+Queue\+\_\+delete\+By\+Shifting\+At\+Index (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})}
+
+
+
+shifts every element in the order queue one place towards left (towards lower indices), from the index given. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & The index, from which all order\+Queue\textquotesingle{}s elements to the right will be left-\/shifted (i.\+e. shifted towards lower indices) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 22 of file order\+Queue.\+c.
+

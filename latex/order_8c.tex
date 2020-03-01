@@ -1,0 +1,151 @@
+\hypertarget{order_8c}{}\section{source/order.c File Reference}
+\label{order_8c}\index{source/order.\+c@{source/order.\+c}}
+
+
+order module\textquotesingle{}s implementation  
+
+
+{\ttfamily \#include \char`\"{}order.\+h\char`\"{}}\newline
+Include dependency graph for order.\+c\+:
+% FIG 0
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structOrder}{Order} \hyperlink{order_8c_a3d6f85b77b9144d23a203321c2198b26}{order\+\_\+init} (int floor, \hyperlink{hardware_8h_a796a8de8ce0ae769d7dbd3327a7bdbe7}{Hardware\+Order} order\+Type)
+\begin{DoxyCompactList}\small\item\em Initializes valid order. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{order_8c_ab42471189adf91795ed28950703ff426}\label{order_8c_ab42471189adf91795ed28950703ff426}} 
+void {\bfseries order\+\_\+turn\+Off\+Light} (\hyperlink{structOrder}{Order} order)
+\item 
+\hyperlink{structOrder}{Order} \hyperlink{order_8c_a06e4ebcc77ac75094b0c116fe6644f95}{order\+\_\+delete} (\hyperlink{structOrder}{Order} order)
+\begin{DoxyCompactList}\small\item\em Deletes order by deactivating its bit in order\+Table (see above), and turning off order light. \end{DoxyCompactList}\item 
+\hyperlink{structOrder}{Order} \hyperlink{order_8c_acedc58c67603185217b3887e2961b0f6}{order\+\_\+copy} (\hyperlink{structOrder}{Order} order)
+\begin{DoxyCompactList}\small\item\em Copies the input order. \end{DoxyCompactList}\item 
+void \hyperlink{order_8c_ac21abcaba13fe4317d10143933c434ec}{order\+\_\+toggle\+Unique} (\hyperlink{structOrder}{Order} order, int on)
+\begin{DoxyCompactList}\small\item\em Toggles corresponding bit in order\+Table to 1 if unique, 0 if removing order. \end{DoxyCompactList}\item 
+int \hyperlink{order_8c_a520157757ba79177e441d39d8e19af0e}{order\+\_\+check\+Unique} (\hyperlink{structOrder}{Order} order)
+\begin{DoxyCompactList}\small\item\em Checks if order already exists. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{order_8c_aec28246cc942e981cf1deb78424b2a75}\label{order_8c_aec28246cc942e981cf1deb78424b2a75}} 
+int \hyperlink{order_8c_aec28246cc942e981cf1deb78424b2a75}{order\+Table} \mbox{[}4\mbox{]}\mbox{[}3\mbox{]}
+\begin{DoxyCompactList}\small\item\em Lookup table that shows \char`\"{}true\char`\"{} (1) for each order that\textquotesingle{}s placed. Table\textquotesingle{}s layout corresponds with hardware.\+c, lines 127 -\/ 132. Used in {\ttfamily order\+\_\+toggle\+Unique} and {\ttfamily order\+\_\+check\+Unique}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+order module\textquotesingle{}s implementation 
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{order_8c_a520157757ba79177e441d39d8e19af0e}\label{order_8c_a520157757ba79177e441d39d8e19af0e}} 
+\index{order.\+c@{order.\+c}!order\+\_\+check\+Unique@{order\+\_\+check\+Unique}}
+\index{order\+\_\+check\+Unique@{order\+\_\+check\+Unique}!order.\+c@{order.\+c}}
+\subsubsection{\texorpdfstring{order\+\_\+check\+Unique()}{order\_checkUnique()}}
+{\footnotesize\ttfamily int order\+\_\+check\+Unique (\begin{DoxyParamCaption}\item[{\hyperlink{structOrder}{Order}}]{order }\end{DoxyParamCaption})}
+
+
+
+Checks if order already exists. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & The order that will be checked for uniqueness (whether it already exists or not).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if {\ttfamily order} is unique, 0 if already exists. 
+\end{DoxyReturn}
+
+
+Definition at line 44 of file order.\+c.
+
+\mbox{\Hypertarget{order_8c_acedc58c67603185217b3887e2961b0f6}\label{order_8c_acedc58c67603185217b3887e2961b0f6}} 
+\index{order.\+c@{order.\+c}!order\+\_\+copy@{order\+\_\+copy}}
+\index{order\+\_\+copy@{order\+\_\+copy}!order.\+c@{order.\+c}}
+\subsubsection{\texorpdfstring{order\+\_\+copy()}{order\_copy()}}
+{\footnotesize\ttfamily \hyperlink{structOrder}{Order} order\+\_\+copy (\begin{DoxyParamCaption}\item[{\hyperlink{structOrder}{Order}}]{order }\end{DoxyParamCaption})}
+
+
+
+Copies the input order. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & The order that is to be copied\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the copy; {\ttfamily order}. 
+\end{DoxyReturn}
+
+
+Definition at line 31 of file order.\+c.
+
+\mbox{\Hypertarget{order_8c_a06e4ebcc77ac75094b0c116fe6644f95}\label{order_8c_a06e4ebcc77ac75094b0c116fe6644f95}} 
+\index{order.\+c@{order.\+c}!order\+\_\+delete@{order\+\_\+delete}}
+\index{order\+\_\+delete@{order\+\_\+delete}!order.\+c@{order.\+c}}
+\subsubsection{\texorpdfstring{order\+\_\+delete()}{order\_delete()}}
+{\footnotesize\ttfamily \hyperlink{structOrder}{Order} order\+\_\+delete (\begin{DoxyParamCaption}\item[{\hyperlink{structOrder}{Order}}]{order }\end{DoxyParamCaption})}
+
+
+
+Deletes order by deactivating its bit in order\+Table (see above), and turning off order light. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & The order that is to be deleted.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily E\+M\+P\+T\+Y\+O\+R\+D\+ER} (see above). 
+\end{DoxyReturn}
+
+
+Definition at line 25 of file order.\+c.
+
+\mbox{\Hypertarget{order_8c_a3d6f85b77b9144d23a203321c2198b26}\label{order_8c_a3d6f85b77b9144d23a203321c2198b26}} 
+\index{order.\+c@{order.\+c}!order\+\_\+init@{order\+\_\+init}}
+\index{order\+\_\+init@{order\+\_\+init}!order.\+c@{order.\+c}}
+\subsubsection{\texorpdfstring{order\+\_\+init()}{order\_init()}}
+{\footnotesize\ttfamily \hyperlink{structOrder}{Order} order\+\_\+init (\begin{DoxyParamCaption}\item[{int}]{floor,  }\item[{\hyperlink{hardware_8h_a796a8de8ce0ae769d7dbd3327a7bdbe7}{Hardware\+Order}}]{order\+Type }\end{DoxyParamCaption})}
+
+
+
+Initializes valid order. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em floor} & The floor the order is being made from or to.\\
+\hline
+{\em order\+Type} & The type of order; up or down from hall, or from inside the cab.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The initialized order. 
+\end{DoxyReturn}
+
+
+Definition at line 11 of file order.\+c.
+
+\mbox{\Hypertarget{order_8c_ac21abcaba13fe4317d10143933c434ec}\label{order_8c_ac21abcaba13fe4317d10143933c434ec}} 
+\index{order.\+c@{order.\+c}!order\+\_\+toggle\+Unique@{order\+\_\+toggle\+Unique}}
+\index{order\+\_\+toggle\+Unique@{order\+\_\+toggle\+Unique}!order.\+c@{order.\+c}}
+\subsubsection{\texorpdfstring{order\+\_\+toggle\+Unique()}{order\_toggleUnique()}}
+{\footnotesize\ttfamily void order\+\_\+toggle\+Unique (\begin{DoxyParamCaption}\item[{\hyperlink{structOrder}{Order}}]{order,  }\item[{int}]{on }\end{DoxyParamCaption})}
+
+
+
+Toggles corresponding bit in order\+Table to 1 if unique, 0 if removing order. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & The order whose bit in order\+Table will be toggled.\\
+\hline
+{\em on} & 1 to set the bit (to 1), 0 to remove the bit (set to 0) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 36 of file order.\+c.
+

@@ -79,15 +79,13 @@ $(function() {
 Include dependency graph for elevator.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="elevator_8h__incl.png" border="0" usemap="#source_2elevator_8h" alt=""/></div>
-<map name="source_2elevator_8h" id="source_2elevator_8h">
-</map>
+<!-- MAP 0 -->
 </div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="elevator_8h__dep__incl.png" border="0" usemap="#source_2elevator_8hdep" alt=""/></div>
-<map name="source_2elevator_8hdep" id="source_2elevator_8hdep">
-</map>
+<!-- MAP 1 -->
 </div>
 </div>
 <p><a href="elevator_8h_source.html">Go to the source code of this file.</a></p>
@@ -96,7 +94,7 @@ This graph shows which files directly or indirectly include this file:</div>
 Typedefs</h2></td></tr>
 <tr class="memitem:a7772897d0691f9c1b54ecf5c59637d39"><td class="memItemLeft" align="right" valign="top"><a id="a7772897d0691f9c1b54ecf5c59637d39"></a>
 typedef <a class="el" href="elevator_8h.html#a5d74787dedbc4e11c1ab15bf487e61f8">State</a>(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="elevator_8h.html#a7772897d0691f9c1b54ecf5c59637d39">StateFunction</a>) ()</td></tr>
-<tr class="memdesc:a7772897d0691f9c1b54ecf5c59637d39"><td class="mdescLeft">&#160;</td><td class="mdescRight">State function pointer typedef-ed. Used in transitioning between states in <code><a class="el" href="main_8c_source.html">main.c</a></code>. <br /></td></tr>
+<tr class="memdesc:a7772897d0691f9c1b54ecf5c59637d39"><td class="mdescLeft">&#160;</td><td class="mdescRight">State function pointer typedef-ed. Used in transitioning between states in <code><a class="el" href="main_8c.html" title="Main file of the elevator. FSM module implementation. ">main.c</a></code>. <br /></td></tr>
 <tr class="separator:a7772897d0691f9c1b54ecf5c59637d39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -109,7 +107,7 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<b>EMERGENCY_STOP</b>
 <br />
- }<tr class="memdesc:a5d74787dedbc4e11c1ab15bf487e61f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum containing values to indicate elevator's current state. Used in the state machine implemented in <code><a class="el" href="main_8c_source.html">main.c</a></code>. <br /></td></tr>
+ }<tr class="memdesc:a5d74787dedbc4e11c1ab15bf487e61f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum containing values to indicate elevator's current state. Used in the state machine implemented in <code><a class="el" href="main_8c.html" title="Main file of the elevator. FSM module implementation. ">main.c</a></code>. <br /></td></tr>
 </td></tr>
 <tr class="separator:a5d74787dedbc4e11c1ab15bf487e61f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -225,7 +223,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
 <p>Checks whether the elevator is at a floor or inbetween floors. Note that this function does not check which floor the elevator might be at, only whether it's at one or not. </p>
 <dl class="section return"><dt>Returns</dt><dd>0 if between floors, 1 if at a floor. Note that it could be at any of the available floors if 1 is returned! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00073">73</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00078">78</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>
@@ -254,7 +252,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>1 if true, 0 if not yet reached. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00059">59</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00064">64</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>
@@ -293,7 +291,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00087">87</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00092">92</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>
@@ -315,7 +313,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
 <p>Checks the criteria for going into state <code>EMERGENCY_STOP</code>. </p>
 <dl class="section return"><dt>Returns</dt><dd>1 if criteria are met, 0 if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00210">210</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00215">215</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>
@@ -344,7 +342,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>New floor if new signal is read, returns <code>lastFloor</code> floor if no new signals are read. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00044">44</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00049">49</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>
@@ -366,7 +364,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
 <p>Checks whether there is an obstruction or not. </p>
 <dl class="section return"><dt>Returns</dt><dd>1 if there is an obstruction, 0 if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00194">194</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00199">199</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>
@@ -388,7 +386,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
 <p>Checks whether there are any orders at the elevator's current floor or not. </p>
 <dl class="section return"><dt>Returns</dt><dd>1 if there are any orders at the elevator's current floor, 0 if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00184">184</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00189">189</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>
@@ -416,7 +414,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00121">121</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00126">126</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>
@@ -438,7 +436,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eleva
 <p>Checks if the stop-button is pressed. </p>
 <dl class="section return"><dt>Returns</dt><dd>1 if the stop-button is pressed, 0 if not. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00198">198</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="elevator_8c_source.html#l00203">203</a> of file <a class="el" href="elevator_8c_source.html">elevator.c</a>.</p>
 
 </div>
 </div>

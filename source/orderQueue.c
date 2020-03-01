@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @brief orderQueue module's implementation
+ *
+**/
+
 #include <stdio.h>
 #include "orderQueue.h"
 

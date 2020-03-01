@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @brief order module's implementation
+ *
+**/
+
 #include "order.h"
 
 int orderTable[4][3];

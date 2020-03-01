@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Order queue functionality
+ * @brief orderQueue functionality
  *
  */
 
